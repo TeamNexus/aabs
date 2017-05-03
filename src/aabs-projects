@@ -1,0 +1,56 @@
+#
+# Project List File required by
+#     Automated Android Build Script
+#
+# Author:	Lukas Berger <mail@lukasberger.at>
+# Date:		03-05-2017
+#
+# -------- Build Action --------
+#
+# zerofltexx    SM-G920F   -     -     -     -     -     -     -;
+#     [0]          [1]    [2]   [3]   [4]   [5]   [6]   [7]   [8]
+#
+#  Device-specific:
+#    [0]: Codename of the device (Variable: %codename%)
+#    [1]: Model of the device (%model%)
+#
+#  ROM-specific:
+#    [2]: Name of the ROM (%rom-name%)
+#    [3]: Relative path at which the source is located (%rom-name%)
+#    [4]: Lunch-Combo used to build the ROM (%lunch-combo%)
+#    [5]: Expression used to find the finished build-artifact
+#
+#  Generic:
+#    [6]: Relative path (directory and file) to which the artifact should be uploaded to (Available: %date%, %time%; self explaining)
+#    [7]: Indicates if "make clobber" should be ran before building the ROM
+#    [8]: Count of concurrect jobs per make-process
+#
+
+################################
+# Global Variables
+$rom-source    ${rom-name};
+$upload-path   ${rom-name}/${codename}/${rom-name}_${date}-${time}_${codename}.zip;
+$clobber       true;
+$concr-jobs    16;
+
+################################
+# LineageOS
+$rom-name      LineageOS;
+$lunch-combo   lineage_${codename}-userdebug;
+$output-expr   lineage-*.zip;
+
+zerofltexx    SM-G920F   -   -   -   -   -   -   -;
+zerofltecan   SM-G920T   -   -   -   -   -   -   -;
+zeroltexx     SM-G925F   -   -   -   -   -   -   -;
+zeroltecan    SM-G925T   -   -   -   -   -   -   -;
+
+################################
+# ResurrectionRemix
+$rom-name      ResurrectionRemix;
+$lunch-combo   lineage_${codename}-userdebug;
+$output-expr   lineage-*.zip;
+
+zerofltexx    SM-G920F   -   -   -   -   -   -   -;
+zerofltecan   SM-G920T   -   -   -   -   -   -   -;
+zeroltexx     SM-G925F   -   -   -   -   -   -   -;
+zeroltecan    SM-G925T   -   -   -   -   -   -   -;
