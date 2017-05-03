@@ -22,8 +22,8 @@ if [ ! $AABS -eq 1 ]; then
 fi
 
 function upload_build {
-	source_dir="${AABS_SOURCE_BASEDIR}/${__rom_source}/out/target/product/${__codename}"
-	upload_path="${AABS_UPLOAD_BASEDIR}/${__upload_path}"
+	source_dir="${source_basedir}/${__rom_source}/out/target/product/${__codename}"
+	upload_path="${upload_basedir}/${__upload_path}"
 	output_artifcat="${source_dir}/$(basename ${source_dir}/${__output_expr})"
 
 	# create SFTP batch file
@@ -34,14 +34,14 @@ function upload_build {
 	echo "exit" >> $batch_file
 
 	# connect and upload
-	sshpass -p "${AABS_UPLOAD_PASS}" sftp -P$AABS_UPLOAD_PORT -b $batch_file $AABS_UPLOAD_USER@$AABS_UPLOAD_HOST
+	sshpass -p "${upload_pass}" sftp -P$upload_port -b $batch_file $upload_user@$upload_host
 
 	# clean up
 	rm $batch_file
 }
 
 function start_build {
-	source_dir="${AABS_SOURCE_BASEDIR}/${__rom_source}"
+	source_dir="${source_basedir}/${__rom_source}"
 
 	cd $source_dir
 
@@ -58,7 +58,7 @@ function start_build {
 	make otapackage -j${__concr_jobs}
 
 	# Build finished, upload if enabled
-	if [[ $AABS_UPLOAD_HOST && ${AABS_UPLOAD_HOST-x} ]]; then
+	if [[ $upload_host && ${upload_host-x} ]]; then
 		upload_build
 	fi
 }

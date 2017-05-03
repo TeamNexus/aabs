@@ -25,6 +25,16 @@ function aabs_variable_validate {
 	name=$1
 
 	valid_commands=(
+		# Global Settings
+		'$source-basedir',
+		'$upload-host',
+		'$upload-port',
+		'$upload-user',
+		'$upload-pass',
+		'$upload-basedir',
+		
+		# Global Variables
+		'$category'
 		'$codename'
 		'$model'
 		'$rom-name'

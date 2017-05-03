@@ -30,6 +30,15 @@
 #
 
 ################################
+# Global Settings
+$source-basedir   /home;
+# $upload-host      download.example.com;
+# $upload-port      22;
+# $upload-user      root;
+# $upload-pass      mypass123;
+# $upload-basedir   /var/www/html/builds/;
+
+################################
 # Global Variables
 $rom-source    ${rom-name};
 $upload-path   ${rom-name}/${codename}/${rom-name}_${date}-${time}_${codename}.zip;
