@@ -42,7 +42,7 @@ function aabs_main {
 	for project in "${project_list[@]}"; do
 
 		project=( $project )
-		
+
 		aabs_parse_variable ${project[0]} ${project[1]}
 		ret=$?
 
