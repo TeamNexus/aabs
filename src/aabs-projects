@@ -7,8 +7,11 @@
 #
 # -------- Build Action --------
 #
-# zerofltexx    SM-G920F   -     -     -     -     -     -     -;
-#     [0]          [1]    [2]   [3]   [4]   [5]   [6]   [7]   [8]
+#   1   zerofltexx    SM-G920F   -     -     -     -     -     -     -;
+#  [0]      [1]          [2]    [3]   [4]   [5]   [6]   [7]   [8]   [9]
+#
+#  AABS-specific (Internal only):
+#    [0]: Category of this build, only built if the user wants to build this category; Can be any string/number
 #
 #  Device-specific:
 #    [0]: Codename of the device (Variable: %codename%)
@@ -38,19 +41,21 @@ $concr-jobs    16;
 $rom-name      LineageOS;
 $lunch-combo   lineage_${codename}-userdebug;
 $output-expr   lineage-*.zip;
+$category      0;
 
-zerofltexx    SM-G920F   -   -   -   -   -   -   -;
-zerofltecan   SM-G920T   -   -   -   -   -   -   -;
-zeroltexx     SM-G925F   -   -   -   -   -   -   -;
-zeroltecan    SM-G925T   -   -   -   -   -   -   -;
+- zerofltexx    SM-G920F   -   -   -   -   -   -   -;
+- zerofltecan   SM-G920T   -   -   -   -   -   -   -;
+- zeroltexx     SM-G925F   -   -   -   -   -   -   -;
+- zeroltecan    SM-G925T   -   -   -   -   -   -   -;
 
 ################################
 # ResurrectionRemix
 $rom-name      ResurrectionRemix;
 $lunch-combo   lineage_${codename}-userdebug;
 $output-expr   lineage-*.zip;
+$category      1;
 
-zerofltexx    SM-G920F   -   -   -   -   -   -   -;
-zerofltecan   SM-G920T   -   -   -   -   -   -   -;
-zeroltexx     SM-G925F   -   -   -   -   -   -   -;
-zeroltecan    SM-G925T   -   -   -   -   -   -   -;
+- zerofltexx    SM-G920F   -   -   -   -   -   -   -;
+- zerofltecan   SM-G920T   -   -   -   -   -   -   -;
+- zeroltexx     SM-G925F   -   -   -   -   -   -   -;
+- zeroltecan    SM-G925T   -   -   -   -   -   -   -;

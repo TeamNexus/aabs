@@ -30,6 +30,7 @@ AABS_BASEDIR=$(dirname $0)
 # startup
 function aabs_main {
 	file=$1
+	requested_category=$2
 
 	if [ ! -f $file ]; then
 		exit 1
@@ -41,7 +42,7 @@ function aabs_main {
 	for project in "${project_list[@]}"; do
 
 		project=( $project )
-
+		
 		aabs_parse_variable ${project[0]} ${project[1]}
 		ret=$?
 
@@ -50,26 +51,33 @@ function aabs_main {
 			continue
 		fi
 
-		# [0] codename
-		# [1] model
-		# [2] rom-name
-		# [3] rom-source
-		# [4] lunch-combo
-		# [5] output-expr
-		# [6] upload-path
-		# [7] clobber
-		# [8] concr-jobs
+		# [0] category
+		# [1] codename
+		# [2] model
+		# [3] rom-name
+		# [4] rom-source
+		# [5] lunch-combo
+		# [6] output-expr
+		# [7] upload-path
+		# [8] clobber
+		# [9] concr-jobs
 
 		# prepare build-variables
-		aabs_get_value "codename"    ${project[0]}
-		aabs_get_value "model"       ${project[1]}
-		aabs_get_value "rom-name"    ${project[2]}
-		aabs_get_value "rom-source"  ${project[3]}
-		aabs_get_value "lunch-combo" ${project[4]}
-		aabs_get_value "output-expr" ${project[5]}
-		aabs_get_value "upload-path" ${project[6]}
-		aabs_get_value "clobber"     ${project[7]}
-		aabs_get_value "concr-jobs"  ${project[8]}
+		aabs_get_value "category"    ${project[0]}
+		aabs_get_value "codename"    ${project[1]}
+		aabs_get_value "model"       ${project[2]}
+		aabs_get_value "rom-name"    ${project[3]}
+		aabs_get_value "rom-source"  ${project[4]}
+		aabs_get_value "lunch-combo" ${project[5]}
+		aabs_get_value "output-expr" ${project[6]}
+		aabs_get_value "upload-path" ${project[7]}
+		aabs_get_value "clobber"     ${project[8]}
+		aabs_get_value "concr-jobs"  ${project[9]}
+
+		# check for the correct category
+		if [ "$requested_category" != "*" ] && [ "$category" != "$requested_category" ]; then
+			continue
+		fi
 
 		export __date=$(date +%Y-%m-%d)
 		export __time=$(date +%H%M)
@@ -98,11 +106,22 @@ function aabs_main {
 
 }
 
-# default project file
-aabs_main ./aabs-projects
+usage() { echo "Usage: $0 -c <Category> -f <Project-File>" 1>&2; exit 1; }
 
-for file in "$@"
-do
-	# passed project files
-   aabs_main $file
+category=""
+project_file=""
+
+while getopts ":c:f:" o; do
+    case "${o}" in
+        c) category=${OPTARG} ;;
+        f) project_file=${OPTARG} ;;
+        *) usage ;;
+    esac
 done
+
+if [ "$category" == "" ]; then usage; fi
+if [ "$project_file" == "" ]; then usage; fi
+
+shift $((OPTIND-1))
+
+aabs_main "$project_file" "$category"
