@@ -15,6 +15,7 @@ and launched.
 
 AABS Project List Format
 ==========
+```
   1   zerofltexx    SM-G920F   -     -     -     -     -     -     -;
  [0]      [1]          [2]    [3]   [4]   [5]   [6]   [7]   [8]   [9]
 
@@ -35,6 +36,7 @@ AABS Project List Format
     [6]: Relative path (directory and file) to which the artifact should be uploaded to (Available: %date%, %time%; self explaining)
     [7]: Indicates if "make clobber" should be ran before building the ROM
     [8]: Count of concurrect jobs per make-process
+```
 
 License
 ==========
