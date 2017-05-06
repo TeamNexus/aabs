@@ -23,9 +23,9 @@ AABS=1
 AABS_BASEDIR=$(dirname $0)
 
 # include libs
-. $AABS_BASEDIR/lib/variables.sh
-. $AABS_BASEDIR/lib/list.sh
-. $AABS_BASEDIR/lib/build.sh
+. $AABS_BASEDIR/../lib/variables.sh
+. $AABS_BASEDIR/../lib/list.sh
+. $AABS_BASEDIR/../lib/build.sh
 
 # startup
 function aabs_main {
@@ -108,7 +108,7 @@ function aabs_main {
 
 usage() { echo "Usage: $0 -c <Category> -f <Project-File>" 1>&2; exit 1; }
 
-category=""
+category="*"
 project_file=""
 
 while getopts ":c:f:" o; do
