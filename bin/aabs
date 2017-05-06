@@ -99,6 +99,11 @@ function aabs_main {
 		aabs_expand_variable "rom-source" "model"
 		aabs_expand_variable "rom-source" "rom-name"
 
+		# expand variables: category
+		aabs_expand_variable "category" "codename"
+		aabs_expand_variable "category" "model"
+		aabs_expand_variable "category" "rom-name"
+
 		# start build
 		start_build
 
