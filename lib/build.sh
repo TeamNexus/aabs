@@ -22,7 +22,7 @@ if [ ! $AABS -eq 1 ]; then
 fi
 
 function upload_build {
-	source_dir="${source_basedir}/${__rom_source}/out/target/product/${__codename}"
+	source_dir="${__rom_source}/out/target/product/${__codename}"
 	upload_path="${upload_basedir}/${__upload_path}"
 	output_artifcat="${source_dir}/$(basename ${source_dir}/${__output_expr})"
 
@@ -41,7 +41,7 @@ function upload_build {
 }
 
 function start_build {
-	source_dir="${source_basedir}/${__rom_source}"
+	source_dir="${__rom_source}"
 
 	cd $source_dir
 
@@ -50,7 +50,7 @@ function start_build {
 	lunch ${__lunch_combo}
 
 	# clean if required
-	if [ $__clobber == "true" ]; then
+	if [ "$__clobber" == "true" ]; then
 		make clobber -j${__concr_jobs}
 	fi
 

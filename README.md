@@ -23,19 +23,19 @@ AABS Project List Format
     [0]: Category of this build, only built if the user wants to build this category; Can be any string/number
 
   Device-specific:
-    [0]: Codename of the device (Variable: %codename%)
-    [1]: Model of the device (%model%)
+    [1]: Codename of the device (Variable: %codename%)
+    [2]: Model of the device (%model%)
 
   ROM-specific:
-    [2]: Name of the ROM (%rom-name%)
-    [3]: Relative path at which the source is located (%rom-name%)
-    [4]: Lunch-Combo used to build the ROM (%lunch-combo%)
-    [5]: Expression used to find the finished build-artifact
+    [3]: Name of the ROM (%rom-name%)
+    [4]: Relative path at which the source is located (%rom-name%)
+    [5]: Lunch-Combo used to build the ROM (%lunch-combo%)
+    [6]: Expression used to find the finished build-artifact
 
   Generic:
-    [6]: Relative path (directory and file) to which the artifact should be uploaded to (Available: %date%, %time%; self explaining)
-    [7]: Indicates if "make clobber" should be ran before building the ROM
-    [8]: Count of concurrect jobs per make-process
+    [7]: Relative path (directory and file) to which the artifact should be uploaded to (Available: %date%, %time%; self explaining)
+    [8]: Indicates if "make clobber" should be ran before building the ROM
+    [9]: Count of concurrect jobs per make-process
 ```
 
 License

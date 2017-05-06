@@ -26,12 +26,11 @@ function aabs_variable_validate {
 
 	valid_commands=(
 		# Global Settings
-		'$source-basedir',
-		'$upload-host',
-		'$upload-port',
-		'$upload-user',
-		'$upload-pass',
-		'$upload-basedir',
+		'$upload-host'
+		'$upload-port'
+		'$upload-user'
+		'$upload-pass'
+		'$upload-basedir'
 		
 		# Global Variables
 		'$category'
