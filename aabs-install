@@ -8,14 +8,10 @@
 # Date:		03-05-2017
 #
 
-AABS_URL="https://github.com/TeamNexus/aabs/archive/master.zip"
-
 # download and extract
-curl -L ${AABS_URL} > aabs.zip
-rm -rf aabs/
-unzip aabs.zip
-mv aabs-master/ aabs/
+git clone https://github.com/TeamNexus/aabs/
+cd ./aabs/
 
 # prepare and launch
-chmod +x aabs/src/aabs
-./aabs/src/aabs
+chmod +x ./bin/aabs
+./bin/aabs -f "./aabs-projects"
