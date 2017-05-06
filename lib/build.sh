@@ -46,7 +46,7 @@ function start_build {
 	cd $source_dir
 
 	# prepare build
-	. source/build
+	. build/envsetup.sh
 	lunch ${__lunch_combo}
 
 	# clean if required
