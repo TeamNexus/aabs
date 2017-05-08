@@ -51,19 +51,27 @@ $lunch-combo   lineage_${codename}-userdebug;
 $output-expr   lineage-*.zip;
 $category      0;
 
-- zerofltexx    SM-G920F   -   -   -   -   -   -   -;
-- zerofltecan   SM-G920T   -   -   -   -   -   -   -;
-- zeroltexx     SM-G925F   -   -   -   -   -   -   -;
-- zeroltecan    SM-G925T   -   -   -   -   -   -   -;
+# Sync the repo once
+@repo sync -c -d --force-sync --jobs=4;
+
+# Build the devices
+# - zerofltexx    SM-G920F   -   -   -   -   -   -   -;
+# - zerofltecan   SM-G920T   -   -   -   -   -   -   -;
+# - zeroltexx     SM-G925F   -   -   -   -   -   -   -;
+# - zeroltecan    SM-G925T   -   -   -   -   -   -   -;
 
 ################################
 # ResurrectionRemix
-$rom-name      ResurrectionRemix;
-$lunch-combo   lineage_${codename}-userdebug;
-$output-expr   lineage-*.zip;
-$category      1;
+# $rom-name      ResurrectionRemix;
+# $lunch-combo   lineage_${codename}-userdebug;
+# $output-expr   lineage-*.zip;
+# $category      1;
 
-- zerofltexx    SM-G920F   -   -   -   -   -   -   -;
-- zerofltecan   SM-G920T   -   -   -   -   -   -   -;
-- zeroltexx     SM-G925F   -   -   -   -   -   -   -;
-- zeroltecan    SM-G925T   -   -   -   -   -   -   -;
+# Sync the repo once
+# @repo sync -c -d --force-sync --jobs=4;
+
+# Build the devices
+# - zerofltexx    SM-G920F   -   -   -   -   -   -   -;
+# - zerofltecan   SM-G920T   -   -   -   -   -   -   -;
+# - zeroltexx     SM-G925F   -   -   -   -   -   -   -;
+# - zeroltecan    SM-G925T   -   -   -   -   -   -   -;

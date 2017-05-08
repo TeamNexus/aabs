@@ -31,7 +31,7 @@ function aabs_variable_validate {
 		'$upload-user'
 		'$upload-pass'
 		'$upload-basedir'
-		
+
 		# Global Variables
 		'$category'
 		'$codename'
@@ -68,8 +68,11 @@ function aabs_parse_variable {
 
 		# make a usable name
 		name=$(echo ${name} | sed -r 's/[\-]+/_/g');
+		local_name="__${name}"
 
 		export $name=${value}
+		export $local_name=${value}
+
 		return 1
 	fi
 

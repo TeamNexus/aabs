@@ -37,7 +37,7 @@ function upload_build {
 	sshpass -p "${upload_pass}" sftp -P$upload_port -b $batch_file $upload_user@$upload_host
 
 	# clean up
-	rm $batch_file
+	rm $batch_filev
 }
 
 function start_build {
