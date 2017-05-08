@@ -32,30 +32,38 @@ function upload_build {
 	echo "cd $(dirname ${upload_path})" >> $batch_file
 	echo "put ${output_artifcat} ${upload_path}" >> $batch_file
 	echo "exit" >> $batch_file
+	__assert__ $?
 
 	# connect and upload
 	sshpass -p "${upload_pass}" sftp -P$upload_port -b $batch_file $upload_user@$upload_host
+	__assert__ $?
 
 	# clean up
 	rm $batch_filev
+	__assert__ $?
 }
 
 function start_build {
 	source_dir="${__rom_source}"
 
 	cd $source_dir
+	__assert__ $?
 
 	# prepare build
 	. build/envsetup.sh
+	__assert__ $?
 	lunch ${__lunch_combo}
+	__assert__ $?
 
 	# clean if required
 	if [ "$__clobber" == "true" ]; then
 		make clobber -j${__concr_jobs}
+		__assert__ $?
 	fi
 
 	# build
 	make otapackage -j${__concr_jobs}
+	__assert__ $?
 
 	# Build finished, upload if enabled
 	if [[ $upload_host && ${upload_host-x} ]]; then

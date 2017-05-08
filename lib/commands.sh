@@ -41,6 +41,7 @@ function command_run_repo {
 	#run repo, prefer pre-installed
 	$(which repo) || $AABS_BIN_REPO \
 		"$1"
+	__assert__ $?
 }
 
 function command_run_git {
@@ -49,4 +50,5 @@ function command_run_git {
 
 	# sync it
 	$(which git) "$1"
+	__assert__ $?
 }

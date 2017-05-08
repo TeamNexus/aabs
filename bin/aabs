@@ -23,6 +23,7 @@ AABS=1
 AABS_BASEDIR=$(dirname $0)
 
 # include libs
+. $AABS_BASEDIR/../lib/utils.sh
 . $AABS_BASEDIR/../lib/build.sh
 . $AABS_BASEDIR/../lib/commands.sh
 . $AABS_BASEDIR/../lib/list.sh
@@ -40,7 +41,9 @@ function aabs_main {
 	# prepare environment
 	export AABS_BIN_REPO=$(mktemp "${TMPDIR:-/tmp/}repo-XXXXXXXXXXXX")
 	curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > $AABS_BIN_REPO
+	__assert__ $?
 	chmod +x $AABS_BIN_REPO
+	__assert__ $?
 
 	# parse the project list
 	aabs_parse_list $file project_list
