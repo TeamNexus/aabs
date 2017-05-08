@@ -24,13 +24,14 @@
 #    [6]: Expression used to find the finished build-artifact
 #
 #  Generic:
-#    [7]: Relative path (directory and file) to which the artifact should be uploaded to (Available: %date%, %time%; self explaining)
+#    [7]: Relative path (directory and file) to which the artifact should be copied/uploaded to (Available: %date%, %time%; self explaining)
 #    [8]: Indicates if "make clobber" should be ran before building the ROM
 #    [9]: Count of concurrect jobs per make-process
 #
 
 ################################
 # Global Settings
+$copy-basedir     /srv/http/
 # $upload-host      download.example.com;
 # $upload-port      22;
 # $upload-user      root;
@@ -40,7 +41,7 @@
 ################################
 # Global Variables
 $rom-source    /home/${rom-name};
-$upload-path   ${rom-name}/${codename}/${rom-name}_${date}-${time}_${codename}.zip;
+$copy-path     ${rom-name}/${codename}/${rom-name}_${date}-${time}_${codename}.zip;
 $clobber       true;
 $concr-jobs    16;
 

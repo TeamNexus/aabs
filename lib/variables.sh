@@ -31,6 +31,7 @@ function aabs_variable_validate {
 		'$upload-user'
 		'$upload-pass'
 		'$upload-basedir'
+		'$copy-basedir'
 
 		# Global Variables
 		'$category'
@@ -40,7 +41,7 @@ function aabs_variable_validate {
 		'$rom-source'
 		'$lunch-combo'
 		'$output-expr'
-		'$upload-path'
+		'$copy-path'
 		'$clobber'
 		'$concr-jobs'
 	)

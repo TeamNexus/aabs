@@ -23,7 +23,7 @@ fi
 
 function upload_build {
 	source_dir="${__rom_source}/out/target/product/${__codename}"
-	upload_path="${upload_basedir}/${__upload_path}"
+	upload_path="${upload_basedir}/${__copy_path}"
 	output_artifcat="${source_dir}/$(basename ${source_dir}/${__output_expr})"
 
 	# create SFTP batch file
@@ -40,6 +40,17 @@ function upload_build {
 
 	# clean up
 	rm $batch_filev
+	__assert__ $?
+}
+
+function copy_build {
+	copy_path="${copy_basedir}/${__copy_path}"
+	output_artifcat="${source_dir}/$(basename ${source_dir}/${__output_expr})"
+	
+	mkdir -p "${copy_path}"
+	__assert__ $?
+	
+	cp "${output_artifcat}" "${copy_path}/"
 	__assert__ $?
 }
 
@@ -65,8 +76,14 @@ function start_build {
 	make otapackage -j${__concr_jobs}
 	__assert__ $?
 
-	# Build finished, upload if enabled
-	if [[ $upload_host && ${upload_host-x} ]]; then
+	# Build finished, copy/upload if enabled
+	# --------------------------------------
+	# I know it's not the correct way, but 
+	# we can be sure the variable is empty or set
+	if [[ "${copy_basedir}" != "" ]]; then
+		copy_build
+	fi
+	if [[ "${upload_host}" != "" ]]; then
 		upload_build
 	fi
 }
