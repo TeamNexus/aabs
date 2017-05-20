@@ -49,14 +49,18 @@ $clobber       true;
 $concr-jobs    16;
 
 ################################
+# Sync the ROM-sources
+$rom-name LineageOS;
+@repo sync -c -d --force-sync --jobs=4;
+$rom-name ResurrectionRemix;
+@repo sync -c -d --force-sync --jobs=4;
+
+################################
 # LineageOS
 $rom-name      LineageOS;
 $lunch-combo   lineage_${codename}-userdebug;
 $output-expr   lineage-*.zip;
-$category      0;
-
-# Sync the repo once
-@repo sync -c -d --force-sync --jobs=4;
+$category      lineage;
 
 # Build the devices
 - zerofltexx    SM-G920F   -   -   -   -   -   -   -;
@@ -69,10 +73,7 @@ $category      0;
 $rom-name      ResurrectionRemix;
 $lunch-combo   lineage_${codename}-userdebug;
 $output-expr   lineage-*.zip;
-$category      1;
-
-# Sync the repo once
-@repo sync -c -d --force-sync --jobs=4;
+$category      rr;
 
 # Build the devices
 - zerofltexx    SM-G920F   -   -   -   -   -   -   -;
