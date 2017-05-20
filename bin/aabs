@@ -105,6 +105,13 @@ function aabs_main {
 		aabs_expand_variable "upload-path" "date"
 		aabs_expand_variable "upload-path" "time"
 
+		# expand variables: copy-path
+		aabs_expand_variable "copy-path" "codename"
+		aabs_expand_variable "copy-path" "model"
+		aabs_expand_variable "copy-path" "rom-name"
+		aabs_expand_variable "copy-path" "date"
+		aabs_expand_variable "copy-path" "time"
+
 		# expand variables: rom-source
 		aabs_expand_variable "rom-source" "codename"
 		aabs_expand_variable "rom-source" "model"
