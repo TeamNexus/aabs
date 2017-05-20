@@ -31,7 +31,7 @@
 
 ################################
 # Global Settings
-$copy-basedir     /srv/http/
+$copy-basedir     /srv/http/;
 # $upload-host      download.example.com;
 # $upload-port      22;
 # $upload-user      root;
