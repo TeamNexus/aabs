@@ -35,11 +35,11 @@
 ################################
 # Global Settings
 $copy-basedir     /srv/http/;
-# $upload-host      download.example.com;
-# $upload-port      22;
-# $upload-user      root;
-# $upload-pass      mypass123;
-# $upload-basedir   /var/www/html/builds/;
+$upload-host      download.example.com;
+$upload-port      22;
+$upload-user      root;
+$upload-pass      mypass123;
+$upload-basedir   /var/www/html/builds/;
 
 ################################
 # Global Variables

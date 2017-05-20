@@ -29,12 +29,17 @@ function upload_build {
 	# create SFTP batch file
 	_batch_file=$(mktemp)
 	echo "mkdir $(dirname ${_upload_path})" > $_batch_file
+	__assert__ $?
 	echo "cd $(dirname ${_upload_path})" >> $_batch_file
-	echo "put ${_output_artifcat} $_{upload_path}" >> $_batch_file
-	echo "exit" >> $batch_file
+	__assert__ $?
+	echo "put ${_output_artifcat} ${_upload_path}" >> $_batch_file
+	__assert__ $?
+	echo "exit" >> $_batch_file
 	__assert__ $?
 
-	# connect and upload
+	# remote: setup paths and upload
+	sshpass -p "${upload_pass}" ssh $upload_user@$upload_host "mkdir -p $(dirname ${_upload_path})"
+	__assert__ $?
 	sshpass -p "${upload_pass}" sftp -P$upload_port -b $_batch_file $upload_user@$upload_host
 	__assert__ $?
 
