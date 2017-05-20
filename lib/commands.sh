@@ -38,9 +38,8 @@ function command_run_repo {
 	source_dir="${__rom_source}"
 	cd $source_dir
 
-	#run repo, prefer pre-installed
-	$(which repo) || $AABS_BIN_REPO \
-		"$1"
+	# run repo
+	$AABS_BIN_REPO "$1"
 	__assert__ $?
 }
 
