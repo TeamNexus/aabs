@@ -8,10 +8,28 @@
 # Date:		03-05-2017
 #
 
-# download and extract
+# download
 git clone https://github.com/TeamNexus/aabs/
-cd ./aabs/
 
-# prepare and launch
-chmod +x ./bin/aabs
-./bin/aabs -f "./aabs-projects"
+# prepare files
+cp ./aabs/aabs-projects .
+chmod +x aabs/bin/aabs
+
+echo ""
+echo "   ======================= FINISHED ======================="
+echo ""
+echo "   You can now edit the aabs-projects file which was copied"
+echo "   to this directory. Further informations about the format"
+echo "   can be found in aabs/README.md."
+echo ""
+echo "   To update AABS, run: "
+echo "     > git -C aabs pull"
+echo ""
+echo "   To start AABS, type: "
+echo "     > ./aabs/bin/aabs -c * -f ./aabs-projects"
+echo ""
+echo "   If you have defined custom categories or if you want to"
+echo "   build one, replace '*' with the ID of this category."
+echo ""
+echo "   ================== AABS by Lukas0610 =================="
+echo ""
