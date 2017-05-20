@@ -23,22 +23,25 @@ fi
 
 function upload_build {
 	_source_dir="${__rom_source}/out/target/product/${__codename}"
-	_upload_path="${upload_basedir}/${__copy_path}"
+	_tmp_upload_path="${upload_basedir}/${__copy_path}"
+	_upload_path="${upload_basedir}/.${__copy_path}"
 	_output_artifcat="${_source_dir}/$(basename ${_source_dir}/${__output_expr})"
 
 	# create SFTP batch file
 	_batch_file=$(mktemp)
-	echo "mkdir $(dirname ${_upload_path})" > $_batch_file
+	echo "mkdir $(dirname ${_tmp_upload_path})" > $_batch_file
 	__assert__ $?
-	echo "cd $(dirname ${_upload_path})" >> $_batch_file
+	echo "cd $(dirname ${_tmp_upload_path})" >> $_batch_file
 	__assert__ $?
-	echo "put ${_output_artifcat} ${_upload_path}" >> $_batch_file
+	echo "put ${_output_artifcat} ${_tmp_upload_path}" >> $_batch_file
+	__assert__ $?
+	echo "rename ${_tmp_upload_path} ${_upload_path}" >> $_batch_file
 	__assert__ $?
 	echo "exit" >> $_batch_file
 	__assert__ $?
 
 	# remote: setup paths and upload
-	sshpass -p "${upload_pass}" ssh $upload_user@$upload_host "mkdir -p $(dirname ${_upload_path})"
+	sshpass -p "${upload_pass}" ssh $upload_user@$upload_host "mkdir -p $(dirname ${_tmp_upload_path})"
 	__assert__ $?
 	sshpass -p "${upload_pass}" sftp -P$upload_port -b $_batch_file $upload_user@$upload_host
 	__assert__ $?
