@@ -39,7 +39,7 @@ function command_run_repo {
 	cd $source_dir
 
 	# run repo
-	$AABS_BIN_REPO "$1"
+	$AABS_BIN_REPO $aabs_arguments
 	__assert__ $?
 }
 
@@ -48,6 +48,6 @@ function command_run_git {
 	cd $source_dir
 
 	# sync it
-	$(which git) "$1"
+	$(which git) $aabs_arguments
 	__assert__ $?
 }
