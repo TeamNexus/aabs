@@ -73,9 +73,10 @@ function aabs_main {
 			# [4] rom-source
 			# [5] lunch-combo
 			# [6] output-expr
-			# [7] upload-path
-			# [8] clobber
-			# [9] concr-jobs
+			# [7] copy-path
+			# [8] upload-path
+			# [9] clobber
+			# [10] concr-jobs
 
 			# prepare build-variables
 			aabs_get_value "category"    ${project[0]}
@@ -85,13 +86,24 @@ function aabs_main {
 			aabs_get_value "rom-source"  ${project[4]}
 			aabs_get_value "lunch-combo" ${project[5]}
 			aabs_get_value "output-expr" ${project[6]}
-			aabs_get_value "upload-path" ${project[7]}
-			aabs_get_value "clobber"     ${project[8]}
-			aabs_get_value "concr-jobs"  ${project[9]}
+			aabs_get_value "copy-path"   ${project[7]}
+			aabs_get_value "upload-path" ${project[8]}
+			aabs_get_value "clobber"     ${project[9]}
+			aabs_get_value "concr-jobs"  ${project[10]}
 
 			export __date=$(date +%Y-%m-%d)
 			export __time=$(date +%H%M)
 		fi
+
+		# expand variables: category
+		aabs_expand_variable "category" "codename"
+		aabs_expand_variable "category" "model"
+		aabs_expand_variable "category" "rom-name"
+
+		# expand variables: rom-source
+		aabs_expand_variable "rom-source" "codename"
+		aabs_expand_variable "rom-source" "model"
+		aabs_expand_variable "rom-source" "rom-name"
 
 		# expand variables: lunch-combo
 		aabs_expand_variable "lunch-combo" "codename"
@@ -111,16 +123,6 @@ function aabs_main {
 		aabs_expand_variable "copy-path" "rom-name"
 		aabs_expand_variable "copy-path" "date"
 		aabs_expand_variable "copy-path" "time"
-
-		# expand variables: rom-source
-		aabs_expand_variable "rom-source" "codename"
-		aabs_expand_variable "rom-source" "model"
-		aabs_expand_variable "rom-source" "rom-name"
-
-		# expand variables: category
-		aabs_expand_variable "category" "codename"
-		aabs_expand_variable "category" "model"
-		aabs_expand_variable "category" "rom-name"
 
 		# check for command
 		if [ "${project[0]:0:1}" == "@" ]; then

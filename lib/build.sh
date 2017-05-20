@@ -44,6 +44,7 @@ function upload_build {
 }
 
 function copy_build {
+	source_dir="${__rom_source}/out/target/product/${__codename}"
 	copy_dir="${copy_basedir}/$(dirname ${__copy_path})"
 	copy_path="${copy_basedir}/${__copy_path}"
 	output_artifcat="${source_dir}/$(basename ${source_dir}/${__output_expr})"
@@ -51,7 +52,7 @@ function copy_build {
 	mkdir -p "${copy_dir}"
 	__assert__ $?
 
-	cp "${output_artifcat}" "${copy_path}/"
+	cp "${output_artifcat}" "${copy_path}"
 	__assert__ $?
 }
 

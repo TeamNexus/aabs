@@ -3,30 +3,33 @@
 #     Automated Android Build Script
 #
 # Author:	Lukas Berger <mail@lukasberger.at>
-# Date:		03-05-2017
+# Date:		20-05-2017
 #
 # -------- Build Action --------
 #
-#   1   zerofltexx    SM-G920F   -     -     -     -     -     -     -;
-#  [0]      [1]          [2]    [3]   [4]   [5]   [6]   [7]   [8]   [9]
+#   1   zerofltexx    SM-G920F   -     -     -     -     -     -     -     -;
+#  [0]      [1]          [2]    [3]   [4]   [5]   [6]   [7]   [8]   [9]   [10]
+#
+#  		-> A simple "-" means that global variable should be used
 #
 #  AABS-specific (Internal only):
-#    [0]: Category of this build, only built if the user wants to build this category; Can be any string/number
+#    [0]:  Category of this build, only built if the user wants to build this category; Can be any string/number (Available variables: ${codename}, ${model}, ${rom-name})
 #
 #  Device-specific:
-#    [1]: Codename of the device (Variable: %codename%)
-#    [2]: Model of the device (%model%)
+#    [1]:  Codename of the device (Name of variable: ${codename})
+#    [2]:  Model of the device (Name: ${model})
 #
 #  ROM-specific:
-#    [3]: Name of the ROM (%rom-name%)
-#    [4]: Relative path at which the source is located (%rom-name%)
-#    [5]: Lunch-Combo used to build the ROM (%lunch-combo%)
-#    [6]: Expression used to find the finished build-artifact
+#    [3]:  Name of the ROM (Name: ${rom-name})
+#    [4]:  Relative path at which the source is located (Available: ${codename}, ${model}, ${rom-name})
+#    [5]:  Lunch-Combo used to build the ROM (Available: ${codename}, ${model}, ${rom-name})
+#    [6]:  Expression used to find the finished build-artifact (Relative to the product's output-directory)
 #
 #  Generic:
-#    [7]: Relative path (directory and file) to which the artifact should be copied/uploaded to (Available: %date%, %time%; self explaining)
-#    [8]: Indicates if "make clobber" should be ran before building the ROM
-#    [9]: Count of concurrect jobs per make-process
+#    [7]:  Relative path (directory and file) to which the artifact should be copied to (Available: ${codename}, ${model}, ${rom-name}, ${date}, ${time})
+#    [8]:  Relative path (directory and file) to which the artifact should be uploaded to (Available: ${codename}, ${model}, ${rom-name}, ${date}, ${time})
+#    [9]:  Indicates if "make clobber" should be ran before building the ROM
+#    [10]: Count of concurrect jobs per make-process
 #
 
 ################################
