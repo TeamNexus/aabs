@@ -47,10 +47,10 @@ function copy_build {
 	copy_dir="${copy_basedir}/$(dirname ${__copy_path})"
 	copy_path="${copy_basedir}/${__copy_path}"
 	output_artifcat="${source_dir}/$(basename ${source_dir}/${__output_expr})"
-	
+
 	mkdir -p "${copy_dir}"
 	__assert__ $?
-	
+
 	cp "${output_artifcat}" "${copy_path}/"
 	__assert__ $?
 }
