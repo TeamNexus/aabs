@@ -23,17 +23,17 @@ fi
 
 function upload_build {
 	_source_dir="${__rom_source}/out/target/product/${__codename}"
-	_tmp_upload_path="${upload_basedir}/${__copy_path}"
-	_upload_path="${upload_basedir}/.${__copy_path}"
-	_output_artifcat="${_source_dir}/$(basename ${_source_dir}/${__output_expr})"
+	_tmp_upload_base="${__copy_path##*/}"
+	_tmp_upload_path="${upload_basedir}/${__copy_path%/*}/.${_tmp_upload_base%.*}.${_tmp_upload_base##*.}"
+	_upload_path="${upload_basedir}/${__copy_path}"
+	_output_artifact_basename=$(basename ${_source_dir}/${__output_expr})
+	_output_artifact="${_source_dir}/${_output_artifact_basename}"
 
 	# create SFTP batch file
 	_batch_file=$(mktemp)
-	echo "mkdir $(dirname ${_tmp_upload_path})" > $_batch_file
-	__assert__ $?
 	echo "cd $(dirname ${_tmp_upload_path})" >> $_batch_file
 	__assert__ $?
-	echo "put ${_output_artifcat} ${_tmp_upload_path}" >> $_batch_file
+	echo "put ${_output_artifact} ${_tmp_upload_path}" >> $_batch_file
 	__assert__ $?
 	echo "rename ${_tmp_upload_path} ${_upload_path}" >> $_batch_file
 	__assert__ $?
@@ -43,7 +43,7 @@ function upload_build {
 	# remote: setup paths and upload
 	sshpass -p "${upload_pass}" ssh $upload_user@$upload_host "mkdir -p $(dirname ${_tmp_upload_path})"
 	__assert__ $?
-	sshpass -p "${upload_pass}" sftp -P$upload_port -b $_batch_file $upload_user@$upload_host
+	sshpass -p "${upload_pass}" sftp -P$upload_port -oBatchMode=no -b$_batch_file $upload_user@$upload_host
 	__assert__ $?
 
 	# clean up
@@ -81,6 +81,9 @@ function start_build {
 		make clobber -j${__concr_jobs}
 		__assert__ $?
 	fi
+
+	# clean output every time
+	rm "${_source_dir}/${__output_expr}"
 
 	# build
 	make bacon -j${__concr_jobs}
