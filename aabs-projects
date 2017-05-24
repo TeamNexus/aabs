@@ -177,13 +177,13 @@ $category      rr;
 # Build the basic device (zerofltexx)
 - zerofltexx    SM-G920F   -   -   -   -   -   -   -;
 
-- zeroltexx     SM-G925F   -   -   -   -   -   -   -;
+- zeroltexx     SM-G925F   -   -   -   bootimage   none   none   -;
 :patch-zeroltexx-model;
 
-- zerofltecan   SM-G920T   -   -   -   -   -   -   -;
+- zerofltecan   SM-G920T   -   -   -   bootimage   none   none   -;
 :patch-zeroxltecan-model;
 
-- zeroltecan    SM-G925T   -   -   -   -   -   -   -;
+- zeroltecan    SM-G925T   -   -   -   bootimage   none   none   -;
 :patch-zeroxltecan-model;
 
 ################################

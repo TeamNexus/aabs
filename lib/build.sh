@@ -93,10 +93,10 @@ function start_build {
 	# --------------------------------------
 	# I know it's not the correct way, but
 	# we can be sure the variable is empty or set
-	if [[ "${copy_basedir}" != "" ]]; then
+	if [ ! -z "${copy_basedir}"] && [[ "${copy_basedir}" != "none" ]]; then
 		copy_build
 	fi
-	if [[ "${upload_host}" != "" ]]; then
+	if [ ! -z "${upload_host}"] && [[ "${copy_basedir}" != "none" ]]; then
 		upload_build
 	fi
 }
