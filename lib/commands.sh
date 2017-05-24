@@ -28,6 +28,7 @@ function command_validate_command {
 		'post-build'
 
 		# OS-commands
+		'export'
 		'repo'
 		'git'
 		'make'

@@ -169,6 +169,11 @@ $lunch-combo   lineage_${codename}-userdebug;
 $output-expr   lineage-*.zip;
 $category      rr;
 
+# Skip user-input
+@export RR_BUILDTYPE=Unofficial
+@export WITH_ROOT_METHOD="magisk"
+@export days_to_log=0
+
 # Build the basic device (zerofltexx)
 - zerofltexx    SM-G920F   -   -   -   -   -   -   -;
 
