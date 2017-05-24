@@ -109,18 +109,18 @@ $upload-basedir   /var/www/html/builds/;
 $rom-source    /home/${rom-name};
 $copy-path     ${rom-name}/${codename}/${rom-name}_${date}-${time}_${codename}.zip;
 $jobs          16;
-$clobber       true;
+$clobber       false;
 
 ################################
 # Sync the ROM-sources
 
-# LineageOS
-$rom-name LineageOS;
-# @repo sync -c -d --force-sync --jobs=4;
-
 # ResurrectionRemix
 $rom-name ResurrectionRemix;
-# @repo sync -c -d --force-sync --jobs=4;
+@repo sync -c -d --force-sync --jobs=4;
+
+# LineageOS
+$rom-name LineageOS;
+@repo sync -c -d --force-sync --jobs=4;
 
 ################################
 # Assign temp-dir
@@ -163,24 +163,6 @@ $tempdir {%tempdir%}
 	@post-build ${codename} build.zip;
 
 ################################
-# LineageOS
-$rom-name      LineageOS;
-$lunch-combo   lineage_${codename}-userdebug;
-$output-expr   lineage-*.zip;
-$category      lineage;
-
-- zerofltexx    SM-G920F   -   -   -   -   -   -   -;
-
-- zeroltexx     SM-G925F   -   -   -   bootimage   none   none   -;
-:patch-zeroltexx-model;
-
-- zerofltecan   SM-G920T   -   -   -   bootimage   none   none   -;
-:patch-zeroxltecan-model;
-
-- zeroltecan    SM-G925T   -   -   -   bootimage   none   none   -;
-:patch-zeroxltecan-model;
-
-################################
 # ResurrectionRemix
 $rom-name      ResurrectionRemix;
 $lunch-combo   lineage_${codename}-userdebug;
@@ -197,4 +179,22 @@ $category      rr;
 :patch-zeroxltecan-model;
 
 - zeroltecan    SM-G925T   -   -   -   -   -   -   -;
+:patch-zeroxltecan-model;
+
+################################
+# LineageOS
+$rom-name      LineageOS;
+$lunch-combo   lineage_${codename}-userdebug;
+$output-expr   lineage-*.zip;
+$category      lineage;
+
+- zerofltexx    SM-G920F   -   -   -   -   -   -   -;
+
+- zeroltexx     SM-G925F   -   -   -   bootimage   none   none   -;
+:patch-zeroltexx-model;
+
+- zerofltecan   SM-G920T   -   -   -   bootimage   none   none   -;
+:patch-zeroxltecan-model;
+
+- zeroltecan    SM-G925T   -   -   -   bootimage   none   none   -;
 :patch-zeroxltecan-model;
