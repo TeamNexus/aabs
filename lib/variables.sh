@@ -22,9 +22,9 @@ if [ ! $AABS -eq 1 ]; then
 fi
 
 function aabs_variable_validate {
-	name=$1
+	local name=$1
 
-	valid_commands=(
+	local valid_commands=(
 		# Global Settings
 		'$upload-host'
 		'$upload-port'
@@ -40,15 +40,16 @@ function aabs_variable_validate {
 		'$rom-name'
 		'$rom-source'
 		'$lunch-combo'
+		'$make-command'
 		'$output-expr'
 		'$copy-path'
 		'$clobber'
-		'$concr-jobs'
 	)
 
 	for i in "${valid_commands[@]}"
 	do
 		if [ "${i}" == "${name}" ] ; then
+			echo "Invalid variable \"${name}\" found while parsing project-list"
 			return 1
 		fi
 	done
@@ -56,23 +57,47 @@ function aabs_variable_validate {
 	return 0
 }
 
+function aabs_is_variable_registered {
+	local e
+	for e in "${aabs_variables[@]}"; do [[ "$e" == "$1" ]] && return 0; done
+	return 1
+}
+
 function aabs_parse_variable {
-	name=$1
-	value=$2
+	local name=$1
+	local value=$2
 
-	aabs_variable_validate ${name}
-	ret=$?
+	# aabs_variable_validate ${name}
+	# ret=$?
 
-	if [ $ret -eq 1 ]; then
+	# if [ $ret -eq 1 ]; then
+	if [ ${name:0:1} == '$' ]; then
 		# parse variable on if possible
-		name="${name:1:${#name}-1}"
+		local name="${name:1:${#name}-1}"
 
 		# make a usable name
-		name=$(echo ${name} | sed -r 's/[\-]+/_/g');
-		local_name="__${name}"
+		local name=$(echo ${name} | sed -r 's/[\-]+/_/g');
+		local local_name="__${name}"
 
-		export $name=${value}
-		export $local_name=${value}
+		# parse the value
+		if [[ "$value" == "{%tempfile%}" ]]; then
+			local value=$(mktemp "${TMPDIR:-/tmp/}aabs-tempfile-XXXXXXXXXXXX")
+		elif [[ "$value" == "{%tempdir%}" ]]; then
+			local value=$(mktemp -d "${TMPDIR:-/tmp/}aabs-tempdir-XXXXXXXXXXXX")
+		fi
+
+		export $name="${name}"
+		export $local_name="${value}"
+
+		aabs_is_variable_registered "$name"
+		if [ $? -eq 1 ]; then
+			if [ -z $aabs_variables ]; then
+				declare -ag aabs_variables=()
+				aabs_variables=($name)
+			else
+				aabs_variables=("${aabs_variables[@]}" "$name")
+			fi
+		fi
 
 		return 1
 	fi
@@ -80,27 +105,88 @@ function aabs_parse_variable {
 	return 0
 }
 
-function aabs_get_value {
-	name=$1
-	value=$2
+function aabs_export_value {
+	local name=$1
+	local value=$2
 
-	name=$(echo ${name} | sed -r 's/[\-]+/_/g');
+	local name=$(echo ${name} | sed -r 's/[\-]+/_/g');
 
 	if [ "${value}" == "-" ]; then
-		value=${!name} # use global value
+		local value=${!name} # use global value
 	fi
 
-	local_name="__${name}"
+	local local_name="__${name}"
 	export $local_name=${value}
 }
 
 function aabs_expand_variable {
-	name=$(echo ${1} | sed -r 's/[\-]+/_/g');
-	varname=$(echo ${2} | sed -r 's/[\-]+/_/g');
-	real_varname=$2;
+	local name=$(echo ${1} | sed -r 's/[\-]+/_/g');
+	local varname=$(echo ${2} | sed -r 's/[\-]+/_/g');
+	local real_varname=$2;
 
-	local_name="__${name}"
-	local_varname="__${varname}"
+	local local_name="__${name}"
+	local local_varname="__${varname}"
 
 	export $local_name=$(echo "${!local_name}" | sed "s/\${${real_varname}}/${!local_varname}/g")
+}
+
+function aabs_export_default_variables {
+	# [0] category
+	# [1] codename
+	# [2] model
+	# [3] rom-name
+	# [4] rom-source
+	# [5] lunch-combo
+	# [6] make-command
+	# [7] output-expr
+	# [8] copy-path
+	# [9] upload-path
+	# [10] clobber
+
+	# prepare build-variables
+	aabs_export_value "category"     ${project[0]}
+	aabs_export_value "codename"     ${project[1]}
+	aabs_export_value "model"        ${project[2]}
+	aabs_export_value "rom-name"     ${project[3]}
+	aabs_export_value "rom-source"   ${project[4]}
+	aabs_export_value "lunch-combo"  ${project[5]}
+	aabs_export_value "make-command" ${project[6]}
+	aabs_export_value "output-expr"  ${project[7]}
+	aabs_export_value "copy-path"    ${project[8]}
+	aabs_export_value "upload-path"  ${project[9]}
+	aabs_export_value "clobber"      ${project[10]}
+
+	export __date=$(date +%Y-%m-%d)
+	export __time=$(date +%H%M)
+}
+
+function aabs_expand_default_variables {
+	# expand variables: category
+	aabs_expand_variable "category" "codename"
+	aabs_expand_variable "category" "model"
+	aabs_expand_variable "category" "rom-name"
+
+	# expand variables: rom-source
+	aabs_expand_variable "rom-source" "codename"
+	aabs_expand_variable "rom-source" "model"
+	aabs_expand_variable "rom-source" "rom-name"
+
+	# expand variables: lunch-combo
+	aabs_expand_variable "lunch-combo" "codename"
+	aabs_expand_variable "lunch-combo" "model"
+	aabs_expand_variable "lunch-combo" "rom-name"
+
+	# expand variables: upload-path
+	aabs_expand_variable "upload-path" "codename"
+	aabs_expand_variable "upload-path" "model"
+	aabs_expand_variable "upload-path" "rom-name"
+	aabs_expand_variable "upload-path" "date"
+	aabs_expand_variable "upload-path" "time"
+
+	# expand variables: copy-path
+	aabs_expand_variable "copy-path" "codename"
+	aabs_expand_variable "copy-path" "model"
+	aabs_expand_variable "copy-path" "rom-name"
+	aabs_expand_variable "copy-path" "date"
+	aabs_expand_variable "copy-path" "time"
 }

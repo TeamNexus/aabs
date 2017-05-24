@@ -22,52 +22,52 @@ if [ ! $AABS -eq 1 ]; then
 fi
 
 function upload_build {
-	_source_dir="${__rom_source}/out/target/product/${__codename}"
-	_tmp_upload_base="${__copy_path##*/}"
-	_tmp_upload_path="${upload_basedir}/${__copy_path%/*}/.${_tmp_upload_base%.*}.${_tmp_upload_base##*.}"
-	_upload_path="${upload_basedir}/${__copy_path}"
-	_output_artifact_basename=$(basename ${_source_dir}/${__output_expr})
-	_output_artifact="${_source_dir}/${_output_artifact_basename}"
+	local source_dir="${__rom_source}/out/target/product/${__codename}"
+	local tmp_upload_base="${__copy_path##*/}"
+	local tmp_upload_path="${upload_basedir}/${__copy_path%/*}/.${tmp_upload_base%.*}.${tmp_upload_base##*.}"
+	local upload_path="${upload_basedir}/${__copy_path}"
+	local output_artifact_basename=$(basename ${source_dir}/${__output_expr})
+	local output_artifact="${source_dir}/${output_artifact_basename}"
 
 	# create SFTP batch file
-	_batch_file=$(mktemp)
-	echo "cd $(dirname ${_tmp_upload_path})" >> $_batch_file
+	local batch_file=$(mktemp)
+	echo "cd $(dirname ${tmp_upload_path})" >> $batch_file
 	__assert__ $?
-	echo "put ${_output_artifact} ${_tmp_upload_path}" >> $_batch_file
+	echo "put ${output_artifact} ${tmp_upload_path}" >> $batch_file
 	__assert__ $?
-	echo "rename ${_tmp_upload_path} ${_upload_path}" >> $_batch_file
+	echo "rename ${tmp_upload_path} ${upload_path}" >> $batch_file
 	__assert__ $?
-	echo "exit" >> $_batch_file
+	echo "exit" >> $batch_file
 	__assert__ $?
 
 	# remote: setup paths and upload
-	sshpass -p "${upload_pass}" ssh $upload_user@$upload_host "mkdir -p $(dirname ${_tmp_upload_path})"
+	sshpass -p "${upload_pass}" ssh $upload_user@$upload_host "mkdir -p $(dirname ${tmp_upload_path})"
 	__assert__ $?
-	sshpass -p "${upload_pass}" sftp -P$upload_port -oBatchMode=no -b$_batch_file $upload_user@$upload_host
+	sshpass -p "${upload_pass}" sftp -P$upload_port -oBatchMode=no -b$batch_file $upload_user@$upload_host
 	__assert__ $?
 
 	# clean up
-	rm $_batch_file
+	rm $batch_file
 	__assert__ $?
 }
 
 function copy_build {
-	_source_dir="${__rom_source}/out/target/product/${__codename}"
-	_copy_dir="${copy_basedir}/$(dirname ${__copy_path})"
-	_copy_path="${copy_basedir}/${__copy_path}"
-	_output_artifcat="${_source_dir}/$(basename ${_source_dir}/${__output_expr})"
+	local source_dir="${__rom_source}/out/target/product/${__codename}"
+	local copy_dir="${copy_basedir}/$(dirname ${__copy_path})"
+	local copy_path="${copy_basedir}/${__copy_path}"
+	local output_artifcat="${source_dir}/$(basename ${source_dir}/${__output_expr})"
 
-	mkdir -p "$_copy_dir}"
+	mkdir -p "$copy_dir}"
 	__assert__ $?
 
-	cp "${_output_artifcat}" "${_copy_path}"
+	cp "${output_artifcat}" "${copy_path}"
 	__assert__ $?
 }
 
 function start_build {
-	_source_dir="${__rom_source}"
+	local source_dir="${__rom_source}"
 
-	cd $_source_dir
+	cd $source_dir
 	__assert__ $?
 
 	# prepare build
@@ -78,15 +78,15 @@ function start_build {
 
 	# clean if required
 	if [ "$__clobber" == "true" ]; then
-		make clobber -j${__concr_jobs}
+		make clobber
 		__assert__ $?
 	fi
 
 	# clean output every time
-	rm "${_source_dir}/${__output_expr}"
+	rm "${source_dir}/${__output_expr}"
 
 	# build
-	make bacon -j${__concr_jobs}
+	make ${__make_command}
 	__assert__ $?
 
 	# Build finished, copy/upload if enabled

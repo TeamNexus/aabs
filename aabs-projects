@@ -3,7 +3,13 @@
 #     Automated Android Build Script
 #
 # Author:	Lukas Berger <mail@lukasberger.at>
-# Date:		20-05-2017
+# Date:		24-05-2017
+#
+# --------   General   --------
+#
+#   - Every line has to end with a semicolon (;)
+#   - If I say tab, I mean tab, no spaces etc.
+#
 #
 # -------- Build Action --------
 #
@@ -13,23 +19,80 @@
 #  		-> A simple "-" means that global variable should be used
 #
 #  AABS-specific (Internal only):
-#    [0]:  Category of this build, only built if the user wants to build this category; Can be any string/number (Available variables: ${codename}, ${model}, ${rom-name})
+#    [0]:   Category of this build, only built if the user wants to build this category; Can be any string/number (Available variables: ${codename}, ${model}, ${rom-name})
 #
 #  Device-specific:
-#    [1]:  Codename of the device (Name of variable: ${codename})
-#    [2]:  Model of the device (Name: ${model})
+#    [1]:   Codename of the device (Name of variable: ${codename})
+#    [2]:   Model of the device (Name: ${model})
 #
 #  ROM-specific:
-#    [3]:  Name of the ROM (Name: ${rom-name})
-#    [4]:  Relative path at which the source is located (Available: ${codename}, ${model}, ${rom-name})
-#    [5]:  Lunch-Combo used to build the ROM (Available: ${codename}, ${model}, ${rom-name})
-#    [6]:  Expression used to find the finished build-artifact (Relative to the product's output-directory)
+#    [3]:   Name of the ROM (Name: ${rom-name})
+#    [4]:   Relative path at which the source is located (Available: ${codename}, ${model}, ${rom-name})
+#    [5]:   Lunch-Combo used to build the ROM (Available: ${codename}, ${model}, ${rom-name})
+#    [6]:   Subcommand with whom "make" should be run
+#    [7]:   Expression used to find the finished build-artifact (Relative to the product's output-directory)
 #
 #  Generic:
-#    [7]:  Relative path (directory and file) to which the artifact should be copied to (Available: ${codename}, ${model}, ${rom-name}, ${date}, ${time})
-#    [8]:  Relative path (directory and file) to which the artifact should be uploaded to (Available: ${codename}, ${model}, ${rom-name}, ${date}, ${time})
-#    [9]:  Indicates if "make clobber" should be ran before building the ROM
-#    [10]: Count of concurrect jobs per make-process
+#    [8]:   Relative path (directory and file) to which the artifact should be copied to (Available: ${codename}, ${model}, ${rom-name}, ${date}, ${time})
+#    [9]:   Relative path (directory and file) to which the artifact should be uploaded to (Available: ${codename}, ${model}, ${rom-name}, ${date}, ${time})
+#    [10]:  Indicates if "make clobber" should be ran before building the ROM
+#
+#
+# --------     Variables    --------
+#
+# $[Name] [Value]
+#
+#   "$":      Indicates a variable
+#   [Name]:   Name of the variable to store
+#             Currently available core-variables:
+#                 - (string) $upload-host         - (string)  $upload-port
+#                 - (string) $upload-user         - (string)  $upload-pass
+#                 - (string) $upload-basedir      - (string)  $copy-basedir
+#                 - (string) $category            - (string)  $codename
+#                 - (string) $model               - (string)  $rom-name
+#                 - (string) $rom-source          - (string)  $lunch-combo
+#                 - (string) $make-command        - (string)  $output-expr
+#                 - (string) $copy-path           - (boolean) $clobber
+#
+#             Current variable-types:
+#                 - string: A simple alphanumeric sequence, may not be placed between double quotes
+#                 - boolean: Accepts "true" and any other string as "false"
+#
+#   [Value]:  Arguments which will be passed to the command
+#
+#   You can even create your own variables, they just have to be compatible to the bash variable-naming
+#      (Except "-", this will be replaced with "_" internally)
+#
+#
+# --------     Commands     --------
+#
+# @[Command] [Arguments]
+#
+#   "@":          Indicates a command
+#   [Command]:    Name of the command to run
+#                 Currently available:
+#                     - repo      - git
+#                     - make      - cp
+#                     - mv        - rm
+#                     - touch     - mkdir
+#                     - zip       - unzip
+#                     - sed
+#
+#   [Arguments]:  Arguments which will be passed to the command
+#
+#
+# --------      Macros      --------
+#
+# Define a macro:
+#
+#   %[macro-name];
+#    <Tab>Default command line (action, command, variable)
+#
+#   Important: <Tab>, not 2, 3, 4, etc. spaces, TAB!
+#
+# Call a macro:
+#
+#   :[macro-name];
 #
 
 ################################
@@ -45,15 +108,59 @@ $upload-basedir   /var/www/html/builds/;
 # Global Variables
 $rom-source    /home/${rom-name};
 $copy-path     ${rom-name}/${codename}/${rom-name}_${date}-${time}_${codename}.zip;
+$jobs          16;
 $clobber       true;
-$concr-jobs    16;
 
 ################################
 # Sync the ROM-sources
+
+# LineageOS
 $rom-name LineageOS;
-@repo sync -c -d --force-sync --jobs=4;
+# @repo sync -c -d --force-sync --jobs=4;
+
+# ResurrectionRemix
 $rom-name ResurrectionRemix;
-@repo sync -c -d --force-sync --jobs=4;
+# @repo sync -c -d --force-sync --jobs=4;
+
+################################
+# Assign temp-dir
+$tempdir {%tempdir%}
+
+################################
+# Create macros
+
+# Repack zeroltexx-builds
+%patch-zeroltexx-model;
+	# Copy and unzip base-build
+	@cp out/target/product/zerofltexx/lineage-* ${tempdir}/build.zip;
+	@unzip ${tempdir}/build.zip -d ${tempdir}/build;
+
+	# Copy the patched targets
+	@mv out/target/product/${codename}/boot.img ${tempdir}/build/boot.img;
+
+	# Repack build and run default post-build actions
+	@zip -r ${tempdir}/build.zip ${tempdir}/build/* ${tempdir}/build/.*;
+	@cp ${tempdir}/build.zip out/target/product/${codename}/build.zip;
+	@post-build ${codename} build.zip;
+
+# Build patches and repack zero(f)ltecan-models
+%patch-zeroxltecan-model;
+	# Build the targets
+	@make audio.primary.universal7420 audio.primary.universal7420_32 -j${jobs};
+
+	# Copy and unzip base-build
+	@cp out/target/product/zerofltexx/lineage-* ${tempdir}/build.zip;
+	@unzip ${tempdir}/build.zip -d ${tempdir}/build;
+
+	# Copy the patched targets
+	@mv out/target/product/${codename}/boot.img ${tempdir}/build/boot.img;
+	@mv out/target/product/${codename}/system/lib/hw/audio.primary.universal7420.so ${tempdir}/build/system/lib/hw/audio.primary.universal7420.so;
+	@mv out/target/product/${codename}/system/lib64/hw/audio.primary.universal7420.so ${tempdir}/build/system/lib64/hw/audio.primary.universal7420.so;
+
+	# Repack build and run default post-build actions
+	@zip -r ${tempdir}/build.zip ${tempdir}/build/* ${tempdir}/build/.*;
+	@cp ${tempdir}/build.zip out/target/product/${codename}/build.zip;
+	@post-build ${codename} build.zip;
 
 ################################
 # LineageOS
@@ -62,11 +169,16 @@ $lunch-combo   lineage_${codename}-userdebug;
 $output-expr   lineage-*.zip;
 $category      lineage;
 
-# Build the devices
 - zerofltexx    SM-G920F   -   -   -   -   -   -   -;
-- zerofltecan   SM-G920T   -   -   -   -   -   -   -;
-- zeroltexx     SM-G925F   -   -   -   -   -   -   -;
-- zeroltecan    SM-G925T   -   -   -   -   -   -   -;
+
+- zeroltexx     SM-G925F   -   -   -   bootimage   none   none   -;
+:patch-zeroltexx-model;
+
+- zerofltecan   SM-G920T   -   -   -   bootimage   none   none   -;
+:patch-zeroxltecan-model;
+
+- zeroltecan    SM-G925T   -   -   -   bootimage   none   none   -;
+:patch-zeroxltecan-model;
 
 ################################
 # ResurrectionRemix
@@ -75,8 +187,14 @@ $lunch-combo   lineage_${codename}-userdebug;
 $output-expr   lineage-*.zip;
 $category      rr;
 
-# Build the devices
+# Build the basic device (zerofltexx)
 - zerofltexx    SM-G920F   -   -   -   -   -   -   -;
-- zerofltecan   SM-G920T   -   -   -   -   -   -   -;
+
 - zeroltexx     SM-G925F   -   -   -   -   -   -   -;
+:patch-zeroltexx-model;
+
+- zerofltecan   SM-G920T   -   -   -   -   -   -   -;
+:patch-zeroxltecan-model;
+
 - zeroltecan    SM-G925T   -   -   -   -   -   -   -;
+:patch-zeroxltecan-model;

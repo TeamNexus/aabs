@@ -15,28 +15,7 @@ and launched.
 
 AABS Project List Format
 ==========
-```
-  1   zerofltexx    SM-G920F   -     -     -     -     -     -     -;
- [0]      [1]          [2]    [3]   [4]   [5]   [6]   [7]   [8]   [9]
-
-  AABS-specific:
-    [0]: Category of this build, only built if the user wants to build this category; Can be any string/number
-
-  Device-specific:
-    [1]: Codename of the device (Variable: %codename%)
-    [2]: Model of the device (%model%)
-
-  ROM-specific:
-    [3]: Name of the ROM (%rom-name%)
-    [4]: Relative path at which the source is located (%rom-name%)
-    [5]: Lunch-Combo used to build the ROM (%lunch-combo%)
-    [6]: Expression used to find the finished build-artifact
-
-  Generic:
-    [7]: Relative path (directory and file) to which the artifact should be uploaded to (Available: %date%, %time%; self explaining)
-    [8]: Indicates if "make clobber" should be ran before building the ROM
-    [9]: Count of concurrect jobs per make-process
-```
+	Moved to /aabs-projects
 
 License
 ==========

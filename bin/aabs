@@ -3,17 +3,17 @@
 #
 # Automated Android Build Script - Simple and automated Android Build-Script
 # Copyright (C) 2017  Lukas Berger
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
@@ -28,35 +28,36 @@ AABS_BASEDIR=$(dirname $0)
 . $AABS_BASEDIR/../lib/commands.sh
 . $AABS_BASEDIR/../lib/list.sh
 . $AABS_BASEDIR/../lib/variables.sh
+. $AABS_BASEDIR/../lib/macros.sh
 
 # startup
 function aabs_main {
-	file=$1
-	requested_category=$2
+	local file=$1
+	local requested_category=$2
 
 	if [ ! -f $file ]; then
 		exit 1
 	fi
 
 	# prepare environment
-	export AABS_BIN_REPO=$(mktemp "${TMPDIR:-/tmp/}repo-XXXXXXXXXXXX")
-	curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > $AABS_BIN_REPO
-	__assert__ $?
-	chmod +x $AABS_BIN_REPO
-	__assert__ $?
+	export AABS_BIN_REPO=$(mktemp "${TMPDIR:-/tmp/}aabs-repo-XXXXXXXXXXXX")
+	# curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > $AABS_BIN_REPO
+	# __assert__ $?
+	# chmod +x $AABS_BIN_REPO
+	# __assert__ $?
 
 	# parse the project list
 	aabs_parse_list $file project_list
 
 	for rproject in "${project_list[@]}"; do
 
-		project=( $rproject )
+		local project=( $rproject )
 
 		aabs_parse_variable ${project[0]} ${project[1]}
-		ret=$?
+		local ret=$?
 
 		if [ $ret -eq 1 ]; then
-			# no build-action, so continue
+			# was a variable, continue
 			continue
 		fi
 
@@ -65,82 +66,52 @@ function aabs_main {
 			continue
 		fi
 
-		if [ "${project[0]:0:1}" != "@" ]; then
-			# [0] category
-			# [1] codename
-			# [2] model
-			# [3] rom-name
-			# [4] rom-source
-			# [5] lunch-combo
-			# [6] output-expr
-			# [7] copy-path
-			# [8] upload-path
-			# [9] clobber
-			# [10] concr-jobs
-
-			# prepare build-variables
-			aabs_get_value "category"    ${project[0]}
-			aabs_get_value "codename"    ${project[1]}
-			aabs_get_value "model"       ${project[2]}
-			aabs_get_value "rom-name"    ${project[3]}
-			aabs_get_value "rom-source"  ${project[4]}
-			aabs_get_value "lunch-combo" ${project[5]}
-			aabs_get_value "output-expr" ${project[6]}
-			aabs_get_value "copy-path"   ${project[7]}
-			aabs_get_value "upload-path" ${project[8]}
-			aabs_get_value "clobber"     ${project[9]}
-			aabs_get_value "concr-jobs"  ${project[10]}
-
-			export __date=$(date +%Y-%m-%d)
-			export __time=$(date +%H%M)
+		if  [ "${project[0]:0:1}" != "@" ] && \
+			[ "${project[0]:0:1}" != "%" ] && \
+			[ "${rproject:0:1}" != "$(echo -e "\t")" ] && \
+			[ "${project[0]:0:1}" != ":" ]; then
+			# Export only if it isn't some sort of command etc.
+			aabs_export_default_variables
 		fi
 
-		# expand variables: category
-		aabs_expand_variable "category" "codename"
-		aabs_expand_variable "category" "model"
-		aabs_expand_variable "category" "rom-name"
+		aabs_expand_default_variables
 
-		# expand variables: rom-source
-		aabs_expand_variable "rom-source" "codename"
-		aabs_expand_variable "rom-source" "model"
-		aabs_expand_variable "rom-source" "rom-name"
+		# check for any sorts of commands
+		if [ "${rproject:0:1}" == "$(echo -e "\t")" ]; then
+			# add the line to the macro
+			macro_add_line "$rproject"
+			__assert__ $?
+		elif [ "${rproject:0:1}" == "@" ]; then
+			# end macro-parsing
+			macro_end_parse
 
-		# expand variables: lunch-combo
-		aabs_expand_variable "lunch-combo" "codename"
-		aabs_expand_variable "lunch-combo" "model"
-		aabs_expand_variable "lunch-combo" "rom-name"
-
-		# expand variables: upload-path
-		aabs_expand_variable "upload-path" "codename"
-		aabs_expand_variable "upload-path" "model"
-		aabs_expand_variable "upload-path" "rom-name"
-		aabs_expand_variable "upload-path" "date"
-		aabs_expand_variable "upload-path" "time"
-
-		# expand variables: copy-path
-		aabs_expand_variable "copy-path" "codename"
-		aabs_expand_variable "copy-path" "model"
-		aabs_expand_variable "copy-path" "rom-name"
-		aabs_expand_variable "copy-path" "date"
-		aabs_expand_variable "copy-path" "time"
-
-		# check for command
-		if [ "${project[0]:0:1}" == "@" ]; then
 			# parse command
 			command_parse "$rproject"
 
 			# run command, only allow specific ones
-			case "${aabs_command}" in
-				"git") command_run_git ;;
-				"repo") command_run_repo ;;
+			case ${aabs_command} in
+				# Internal commands
+				post-build) command_run_post_build ;;
+
+				# OS-commands
+				repo) command_run_repo ;;
+				*) command_run ${aabs_command} ;;
 			esac
+		elif [ "${rproject:0:1}" == "%" ]; then
+			# start parsing macro
+			macro_start_parse "$rproject"
+		elif [ "${rproject:0:1}" == ":" ]; then
+			# run the given macro
+			macro_run "${project[0]:0:1}"
 		else
+			# end macro-parsing
+			macro_end_parse
+
 			# start build
 			start_build
 		fi
 
 	done
-
 }
 
 usage() { echo "Usage: $0 -c <Category> -f <Project-File>" 1>&2; exit 1; }
@@ -149,11 +120,11 @@ category="*"
 project_file=""
 
 while getopts ":c:f:" o; do
-    case "${o}" in
-        c) category=${OPTARG} ;;
-        f) project_file=${OPTARG} ;;
-        *) usage ;;
-    esac
+	case "${o}" in
+		c) category="${OPTARG}" ;;
+		f) project_file="${OPTARG}" ;;
+		*) usage ;;
+	esac
 done
 
 if [ "$category" == "" ]; then usage; fi
