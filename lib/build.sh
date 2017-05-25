@@ -23,9 +23,9 @@ fi
 
 function upload_build {
 	local source_dir="${__rom_source}/out/target/product/${__codename}"
-	local tmp_upload_base="${__copy_path##*/}"
-	local tmp_upload_path="${upload_basedir}/${__copy_path%/*}/.${tmp_upload_base%.*}.${tmp_upload_base##*.}"
-	local upload_path="${upload_basedir}/${__copy_path}"
+	local tmp_upload_base="${__upload_path##*/}"
+	local tmp_upload_path="${upload_basedir}/${__upload_path%/*}/.${tmp_upload_base%.*}.${tmp_upload_base##*.}"
+	local upload_path="${upload_basedir}/${__upload_path}"
 	local output_artifact_basename=$(basename ${source_dir}/${__output_expr})
 	local output_artifact="${source_dir}/${output_artifact_basename}"
 
@@ -57,7 +57,7 @@ function copy_build {
 	local copy_path="${copy_basedir}/${__copy_path}"
 	local output_artifcat="${source_dir}/$(basename ${source_dir}/${__output_expr})"
 
-	mkdir -p "$copy_dir}"
+	mkdir -p "$copy_dir"
 	__assert__ $?
 
 	cp "${output_artifcat}" "${copy_path}"
@@ -67,6 +67,7 @@ function copy_build {
 function start_build {
 	local source_dir="${__rom_source}"
 
+	echo "Changed directory to \"${source_dir}\""
 	cd $source_dir
 	__assert__ $?
 
@@ -78,25 +79,25 @@ function start_build {
 
 	# clean if required
 	if [ "$__clobber" == "true" ]; then
-		make clobber
+		make clobber -j${jobs}
 		__assert__ $?
 	fi
 
 	# clean output every time
-	rm "${source_dir}/${__output_expr}"
+	rm -fv "${source_dir}/out/target/product/${__codename}/${__output_expr}"
 
 	# build
-	make ${__make_command}
+	make ${__make_command} -j${jobs}
 	__assert__ $?
 
 	# Build finished, copy/upload if enabled
 	# --------------------------------------
 	# I know it's not the correct way, but
 	# we can be sure the variable is empty or set
-	if [ ! -z "${copy_basedir}"] && [[ "${copy_basedir}" != "none" ]]; then
+	if [ "${__copy_path}" != "" ]; then
 		copy_build
 	fi
-	if [ ! -z "${upload_host}"] && [[ "${copy_basedir}" != "none" ]]; then
+	if [ "${__upload_path}" != "" ]; then
 		upload_build
 	fi
 }

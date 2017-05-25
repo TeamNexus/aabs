@@ -34,6 +34,7 @@ function aabs_variable_validate {
 		'$copy-basedir'
 
 		# Global Variables
+		'$jobs'
 		'$category'
 		'$codename'
 		'$model'
@@ -71,31 +72,36 @@ function aabs_parse_variable {
 	# ret=$?
 
 	# if [ $ret -eq 1 ]; then
-	if [ ${name:0:1} == '$' ]; then
+	if [ "${name:0:1}" == "\$" ]; then
 		# parse variable on if possible
 		local name="${name:1:${#name}-1}"
+		local realname=${name}
 
 		# make a usable name
 		local name=$(echo ${name} | sed -r 's/[\-]+/_/g');
 		local local_name="__${name}"
+		local deflocal_name="__def_${name}"
 
 		# parse the value
 		if [[ "$value" == "{%tempfile%}" ]]; then
 			local value=$(mktemp "${TMPDIR:-/tmp/}aabs-tempfile-XXXXXXXXXXXX")
 		elif [[ "$value" == "{%tempdir%}" ]]; then
 			local value=$(mktemp -d "${TMPDIR:-/tmp/}aabs-tempdir-XXXXXXXXXXXX")
+		elif [ "${value}" == "none" ]; then
+			local value="" # use no value
 		fi
 
-		export $name="${name}"
-		export $local_name="${value}"
+		export $name=${value}
+		export $local_name=${value}
+		export $deflocal_name=${value}
 
 		aabs_is_variable_registered "$name"
 		if [ $? -eq 1 ]; then
 			if [ -z $aabs_variables ]; then
 				declare -ag aabs_variables=()
-				aabs_variables=($name)
+				aabs_variables=($realname)
 			else
-				aabs_variables=("${aabs_variables[@]}" "$name")
+				aabs_variables=("${aabs_variables[@]}" "$realname")
 			fi
 		fi
 
@@ -113,21 +119,32 @@ function aabs_export_value {
 
 	if [ "${value}" == "-" ]; then
 		local value=${!name} # use global value
+	elif [ "${value}" == "none" ]; then
+		local value="" # use no value
 	fi
 
 	local local_name="__${name}"
-	export $local_name=${value}
+	local deflocal_name="__def_${name}"
+
+	export $local_name="${value}"
+	export $deflocal_name="${value}"
+}
+
+function aabs_reset_variable {
+	local name=$(echo ${1} | sed -r 's/[\-]+/_/g');
+	local local_name="__${name}"
+	local deflocal_name="__def_${name}"
+	export $local_name=${!deflocal_name}
 }
 
 function aabs_expand_variable {
 	local name=$(echo ${1} | sed -r 's/[\-]+/_/g');
-	local varname=$(echo ${2} | sed -r 's/[\-]+/_/g');
-	local real_varname=$2;
-
 	local local_name="__${name}"
+
+	local varname=$(echo ${2} | sed -r 's/[\-]+/_/g');
 	local local_varname="__${varname}"
 
-	export $local_name=$(echo "${!local_name}" | sed "s/\${${real_varname}}/${!local_varname}/g")
+	export $local_name=$(echo "${!local_name}" | sed "s/\${$2}/${!local_varname}/g")
 }
 
 function aabs_export_default_variables {
@@ -162,31 +179,36 @@ function aabs_export_default_variables {
 
 function aabs_expand_default_variables {
 	# expand variables: category
+	aabs_reset_variable  "category"
 	aabs_expand_variable "category" "codename"
 	aabs_expand_variable "category" "model"
 	aabs_expand_variable "category" "rom-name"
 
 	# expand variables: rom-source
+	aabs_reset_variable  "rom-source"
 	aabs_expand_variable "rom-source" "codename"
 	aabs_expand_variable "rom-source" "model"
 	aabs_expand_variable "rom-source" "rom-name"
 
 	# expand variables: lunch-combo
+	aabs_reset_variable  "lunch-combo"
 	aabs_expand_variable "lunch-combo" "codename"
 	aabs_expand_variable "lunch-combo" "model"
 	aabs_expand_variable "lunch-combo" "rom-name"
 
-	# expand variables: upload-path
-	aabs_expand_variable "upload-path" "codename"
-	aabs_expand_variable "upload-path" "model"
-	aabs_expand_variable "upload-path" "rom-name"
-	aabs_expand_variable "upload-path" "date"
-	aabs_expand_variable "upload-path" "time"
-
 	# expand variables: copy-path
+	aabs_reset_variable  "copy-path"
 	aabs_expand_variable "copy-path" "codename"
 	aabs_expand_variable "copy-path" "model"
 	aabs_expand_variable "copy-path" "rom-name"
 	aabs_expand_variable "copy-path" "date"
 	aabs_expand_variable "copy-path" "time"
+
+	# expand variables: upload-path
+	aabs_reset_variable  "upload-path"
+	aabs_expand_variable "upload-path" "codename"
+	aabs_expand_variable "upload-path" "model"
+	aabs_expand_variable "upload-path" "rom-name"
+	aabs_expand_variable "upload-path" "date"
+	aabs_expand_variable "upload-path" "time"
 }

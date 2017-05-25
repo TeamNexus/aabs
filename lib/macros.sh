@@ -22,15 +22,23 @@ if [ ! $AABS -eq 1 ]; then
 fi
 
 function macro_start_parse {
-	local name=${1:1}
-	local name=$(echo ${name} | sed -r 's/[\-]+/_/g');
-	local local_name="__${name}"
+	if [ "${aabs_current_macro}" != "" ]; then
+		return 1
+	fi
 
-	eval "export ${local_name}=()"
-	export aabs_current_macro=${local_name}
+	local name=${1}
+	local name=$(echo ${name} | sed -r 's/[\-]+/_/g');
+	local local_name="__aabs_macro_${name}"
+
+	eval "export __aabs_macro_$name=\"\""
+	export aabs_current_macro=$name
 }
 
 function macro_end_parse {
+	if [ "${aabs_current_macro}" == "" ]; then
+		return 1
+	fi
+
 	export aabs_current_macro=""
 }
 
@@ -39,21 +47,23 @@ function macro_add_line {
 		return 1
 	fi
 
-	local macro=$aabs_current_macro
-	local value=${1:1}
-	eval "export ${macro}+=('${value}')"
+	local full_name="__aabs_macro_$aabs_current_macro"
+
+	if [ "${!full_name}" == "" ]; then
+		eval "export $full_name=\"$1\""
+	else
+		eval "export $full_name=\"${!full_name};$1\""
+	fi
 }
 
 function macro_run {
-	local name=${1:1}
-	local name=$(echo ${name} | sed -r 's/[\-]+/_/g');
-	local local_name="__${name}"
-	local content=${!local_name}
+	local name=$(echo ${1} | sed -r 's/[\-]+/_/g');
+	local local_name="__aabs_macro_${name}"
 
-	# parse the project list
-	aabs_parse_list $file macro_project_list
+	IFS=';' read -ra aabs_marco_run_list <<< $(echo ${!local_name})
+	local list_items=${#aabs_marco_run_list[@]}
 
-	for macro_rproject in "${macro_project_list[@]}"; do
+	for macro_rproject in "${aabs_marco_run_list[@]}"; do
 
 		local macro_project=( $macro_rproject )
 
@@ -79,7 +89,7 @@ function macro_run {
 		# check for command
 		if [ "${macro_project[0]:0:1}" == "@" ]; then
 			# parse command
-			command_parse "$rproject"
+			command_parse "$macro_rproject"
 
 			# run command, only allow specific ones
 			case ${aabs_command} in

@@ -41,10 +41,10 @@ function aabs_main {
 
 	# prepare environment
 	export AABS_BIN_REPO=$(mktemp "${TMPDIR:-/tmp/}aabs-repo-XXXXXXXXXXXX")
-	# curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > $AABS_BIN_REPO
-	# __assert__ $?
-	# chmod +x $AABS_BIN_REPO
-	# __assert__ $?
+	curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > $AABS_BIN_REPO
+	__assert__ $?
+	chmod +x $AABS_BIN_REPO
+	__assert__ $?
 
 	# parse the project list
 	aabs_parse_list $file project_list
@@ -66,22 +66,21 @@ function aabs_main {
 			continue
 		fi
 
-		if  [ "${project[0]:0:1}" != "@" ] && \
+		if  [ "${project[0]:0:1}" != ">" ] && \
+			[ "${project[0]:0:1}" != "@" ] && \
 			[ "${project[0]:0:1}" != "%" ] && \
-			[ "${rproject:0:1}" != "$(echo -e "\t")" ] && \
 			[ "${project[0]:0:1}" != ":" ]; then
-			# Export only if it isn't some sort of command etc.
+			# Export variables
 			aabs_export_default_variables
 		fi
 
 		aabs_expand_default_variables
 
 		# check for any sorts of commands
-		if [ "${rproject:0:1}" == "$(echo -e "\t")" ]; then
-			# add the line to the macro
-			macro_add_line "$rproject"
-			__assert__ $?
-		elif [ "${rproject:0:1}" == "@" ]; then
+		if [ "${project[0]:0:1}" == ">" ]; then
+			# add the line to the macro, but remote " >"
+			macro_add_line "${rproject:2}"
+		elif [ "${project[0]:0:1}" == "@" ]; then
 			# end macro-parsing
 			macro_end_parse
 
@@ -97,12 +96,13 @@ function aabs_main {
 				repo) command_run_repo ;;
 				*) command_run ${aabs_command} ;;
 			esac
-		elif [ "${rproject:0:1}" == "%" ]; then
-			# start parsing macro
-			macro_start_parse "$rproject"
-		elif [ "${rproject:0:1}" == ":" ]; then
+		elif [ "${project[0]:0:1}" == "%" ]; then
+			# end and start parsing macro
+			macro_end_parse
+			macro_start_parse "${project[0]:1}"
+		elif [ "${project[0]:0:1}" == ":" ]; then
 			# run the given macro
-			macro_run "${project[0]:0:1}"
+			macro_run "${project[0]:1}"
 		else
 			# end macro-parsing
 			macro_end_parse

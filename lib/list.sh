@@ -30,7 +30,6 @@ function aabs_parse_list {
 	content=$(echo "$content" | sed '/^$/d')
 
 	# read and split lines
-	IFS=';' read -ra $list <<< $(echo $content | tr -s "\n")
-
+	IFS=';' read -ra $list <<< $(echo $content)
 	export $list="${project_list}"
 }

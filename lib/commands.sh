@@ -24,7 +24,6 @@ fi
 function command_validate_command {
 	local valid_commands=(
 		# Internal commands
-		'pre-build'
 		'post-build'
 
 		# OS-commands
@@ -45,12 +44,12 @@ function command_validate_command {
 
 	for i in "${valid_commands[@]}"
 	do
-		if [ "${i}" == "${command}" ] ; then
+		if [ "${i}" == "${1}" ] ; then
 			return 0
 		fi
 	done
 
-	echo "Invalid command \"${name}\" found while parsing project-list"
+	echo "Invalid command \"${1}\" found while parsing project-list"
 	return 1
 }
 
@@ -84,18 +83,20 @@ function command_run {
 	local source_dir="${__rom_source}"
 	local command=${1}
 
+	echo "Changed directory to \"${source_dir}\""
 	cd $source_dir
 	__assert__ $?
 
 	# run command
-	echo "command_run: $(which ${command}) $aabs_arguments"
-	$(which ${command}) $aabs_arguments
+	echo "command_run: ${command} $aabs_arguments"
+	${command} $aabs_arguments
 	__assert__ $?
 }
 
 function command_run_repo {
 	local source_dir="${__rom_source}"
 
+	echo "Changed directory to \"${source_dir}\""
 	cd $source_dir
 	__assert__ $?
 
