@@ -1,0 +1,628 @@
+#!/bin/bash
+
+#
+# Automated Android Build Script - Simple and automated Android Build-Script
+# Copyright (C) 2017  Lukas Berger
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+#
+# @author       Lukas Berger
+# @date         2017-05-26
+# @version      1.0
+#
+
+function __aabs_main {
+    # sync them first
+    __aabs_sync "ResurrectionRemix"
+    __aabs_sync "LineageOS"
+
+    # export defaults for ResurrectionRemix
+    export RR_BUILDTYPE=Unofficial # Unofficial build
+    export WITH_ROOT_METHOD="1"    # No Root
+    export days_to_log=0           # No changelog
+
+    # then build them
+    __aabs_build "ResurrectionRemix"
+    __aabs_build "LineageOS"
+}
+
+#
+# Sync the sources of the passed ROM
+#
+# @param[1]  Name of the ROM which should be synced
+#
+# @usage     __aabs_sync [ROM-Name]
+#
+function __aabs_sync {
+    local rom_name=$1
+
+    # check if syncing is disabled
+    if [ "${AABS_ARGS_SKIP_SYNC}" == "true" ]; then
+        return 1
+    fi
+
+    # check if ROM is disabled
+    __aabs_check_rom $rom_name
+    if [ $? -eq 1 ]; then
+        return 1
+    fi
+
+    echo "Changed directory to ${AABS_SOURCE_BASE}/${rom_name}"
+    cd "${AABS_SOURCE_BASE}/${rom_name}"
+    __aabs_assert $?
+
+    repo sync -c -d --force-sync --no-clone-bundle --jobs=${AABS_SYNC_JOBS}
+    __aabs_assert $?
+}
+
+#
+# Build and patch all device-trees using the
+# passed ROM-sources
+#
+# @param[1]  Name of the ROM which should be built
+#
+# @usage     __aabs_build [ROM-Name]
+#
+function __aabs_build {
+    local rom_name=$1
+
+    # check if ROM is disabled
+    __aabs_check_rom $rom_name
+    if [ $? -eq 1 ]; then
+        return 1
+    fi
+
+    __aabs_build_target ${rom_name} "zerofltexx" "bacon" "${AABS_BUILD_CLOBBER}"
+    __aabs_upload ${rom_name} "zerofltexx"
+
+    __aabs_build_target ${rom_name} "zeroltexx"   "bootimage"
+    __aabs_patch ${rom_name} "zeroltexx" "zeroltexx" "zerofltexx" \
+        "boot.img"
+    __aabs_upload_patch ${rom_name} "zeroltexx" "zerofltexx"
+
+    __aabs_build_target ${rom_name} "zerofltecan" "bootimage audio.primary.universal7420 audio.primary.universal7420_32"
+    __aabs_patch ${rom_name} "zerofltecan" "zerofltecan" "zerofltexx" \
+        "boot.img" \
+        "system/lib/hw/audio.primary.universal7420.so" \
+        "system/lib64/hw/audio.primary.universal7420.so" \
+        "/device/samsung/zeroltecan/configs/audio/mixer_paths_0.xml:system/etc/mixer_paths_0.xml"
+    __aabs_upload_patch ${rom_name} "zerofltecan" "zerofltexx"
+
+    __aabs_build_target ${rom_name} "zeroltecan"  "bootimage"
+    __aabs_patch ${rom_name} "zeroltecan" "zerofltecan" "zerofltexx" \
+        "boot.img" \
+        "system/lib/hw/audio.primary.universal7420.so" \
+        "system/lib64/hw/audio.primary.universal7420.so" \
+        "/device/samsung/zeroltecan/configs/audio/mixer_paths_0.xml:system/etc/mixer_paths_0.xml"
+    __aabs_upload_patch ${rom_name} "zeroltecan" "zerofltexx"
+}
+
+#
+# Build the given make-target from the given ROM-sources
+#
+# @param[1]  Name of the ROM which should be built
+# @param[2]  The target device-tree (Used in the "lunch"-command)
+# @param[3]  The make-target which should be used to start the build
+# @param[4]  Indicates if "make clobber" should be ran (Optional, default: "false")
+#
+# @usage     __aabs_build_target [ROM-Name] [Device-Tree] [Make-command]
+#
+function __aabs_build_target {
+    local rom_name=$1
+    local device=$2
+    local make_target=$3
+    local do_clobber=${4:-"false"}
+
+    # check if device is disabled
+    __aabs_check_device $device
+    if [ $? -eq 1 ]; then
+        return 1
+    fi
+
+    echo "Changed directory to ${AABS_SOURCE_BASE}/${rom_name}"
+    cd "${AABS_SOURCE_BASE}/${rom_name}"
+    __aabs_assert $?
+
+    # prepare environment
+    source build/envsetup.sh
+    __aabs_assert $?
+
+    lunch lineage_${device}-userdebug
+    __aabs_assert $?
+
+    # clobber if required
+    if [ "${do_clobber}" == "true" ]; then
+        make clobber -j${AABS_BUILD_JOBS}
+        __aabs_assert $?
+    fi
+
+    # but always clean previous builds
+    rm -vf out/target/product/${device}/${AABS_BUILD_OUTPUT_MATCH}
+
+    make ${make_target} -j${AABS_BUILD_JOBS}
+    __aabs_assert $?
+}
+
+#
+# Properly patch the given base-build using the passed
+# patch/replacement-files
+#
+# @param[1]  Name of the ROM which should be used
+# @param[2]  The target device-tree
+# @param[3]  The device-tree where the patch-files should be taken from
+# @param[4]  The device-tree which build should be used as base
+# @param[@]  Relative path to all files which should be replaced
+#
+# @usage     __aabs_patch [ROM-Name] [Target Device-Tree] \
+#                         [Patch-containing Device-Tree] [Base Device-Tree] \
+#                         [Infinite list of files to replace...]
+#
+function __aabs_patch {
+    if [ "${AABS_BUILD_INCREMENTAL_PATCHES}" == "true" ]; then
+        __aabs_incremental_patch $@
+        return 1
+    fi
+
+    local rom_name=$1
+    local target_device=$2
+    local patch_device=$3
+    local base_device=$4
+    local tempdir=$(mktemp -d "${TMPDIR:-/tmp/}aabs-patchdir-XXXXXXXXXXXX")
+
+    shift 4; local patch_files=( "$@" )
+
+    # check if device is disabled
+    __aabs_check_device $target_device
+    if [ $? -eq 1 ]; then
+        return 1
+    fi
+
+    echo "Changed directory to ${AABS_SOURCE_BASE}/${rom_name}"
+    cd "${AABS_SOURCE_BASE}/${rom_name}"
+    __aabs_assert $?
+
+    # Prepare dynamic variables
+    local base_device_dir="${AABS_SOURCE_BASE}/${rom_name}/out/target/product/${base_device}"
+    local base_device_name=$(basename ${base_device_dir}/${AABS_BUILD_OUTPUT_MATCH})
+    local base_device_path=${base_device_dir}/${base_device_name}
+    __aabs_assert $?
+    local target_device_path="${AABS_SOURCE_BASE}/${rom_name}/out/target/product/${target_device}"
+
+    cp -f ${base_device_path} ${tempdir}/${base_device_name}
+    __aabs_assert $?
+    unzip ${tempdir}/${base_device_name} -d ${tempdir}/build
+    __aabs_assert $?
+
+    # prepare files
+    local patch_file=""
+    for patch_file in "${patch_files[@]}"; do
+        local src="out/target/product/${patch_device}/${patch_file}"
+        local dst="${tempdir}/patch/${patch_file}"
+        if [ "${patch_file:0:1}" == "/" ]; then
+            local filearr=()
+            IFS=':' read -ra filearr <<< "${patch_file:1}"
+
+            local src="${AABS_SOURCE_BASE}/${rom_name}/${filearr[0]}"
+            local dst="${tempdir}/patch/${filearr[1]}"
+        fi
+
+        mkdir -p $(dirname ${dst})
+        __aabs_assert $?
+
+        echo "Copy \"$src\" to \"$dst\""
+        cp -f $src $dst
+        __aabs_assert $?
+    done
+
+    cd ${AABS_SOURCE_BASE}/${rom_name}
+    __aabs_assert $?
+
+    # Repack and copy the build
+    rm -f ${tempdir}/${base_device_name}
+    __aabs_assert $?
+    zip -r9 ${tempdir}/${base_device_name} ${tempdir}/build/*
+    __aabs_assert $?
+    mkdir -p ${target_device_path}
+    __aabs_assert $?
+    cp -f ${tempdir}/${base_device_name} ${target_device_path}
+    __aabs_assert $?
+
+    # Clean up
+    rm -rf ${tempdir}
+    __aabs_assert $?
+}
+
+#
+# Create an extra, incremental patch-file out of required files.
+# Required to support block-based builds.
+#
+# @param[1]  Name of the ROM which should be used
+# @param[2]  The target device-tree
+# @param[3]  The device-tree where the patch-files should be taken from
+# @param[4]  The device-tree which build should be used as base
+# @param[@]  Relative path to all files which should be replaced
+#
+# @usage     __aabs_incremental_patch [ROM-Name] [Target Device-Tree] \
+#                                     [Patch-containing Device-Tree] [Base Device-Tree] \
+#                                     [Infinite list of files to replace...]
+#
+function __aabs_incremental_patch {
+    local rom_name=$1
+    local target_device=$2
+    local patch_device=$3
+    local base_device=$4
+    local tempdir=$(mktemp -d "${TMPDIR:-/tmp/}aabs-patchdir-XXXXXXXXXXXX")
+
+    local has_boot="false"
+    local has_system="false"
+
+    shift 4; local patch_files=( "$@" )
+
+    # check if device is disabled
+    __aabs_check_device $target_device
+    if [ $? -eq 1 ]; then
+        return 1
+    fi
+
+    # gather some informations
+    local patch_file=""
+    for patch_file in "${patch_files[@]}"; do
+        if [[ "$patch_file" == "system/"* ]]; then
+            local has_system="true"
+        elif [[ "$patch_file" == "boot.img" ]]; then
+            local has_boot="true"
+        fi
+    done
+
+    echo "Changed directory to ${AABS_SOURCE_BASE}/${rom_name}"
+    cd "${AABS_SOURCE_BASE}/${rom_name}"
+    __aabs_assert $?
+
+    # Prepare dynamic variables
+    local updater_script_dir="${tempdir}/patch/META-INF/com/google/android"
+    local updater_binary="${updater_script_dir}/updater-binary"
+    local updater_script="${updater_script_dir}/updater-script"
+
+    # Prepare dynamic base-device variables
+    local base_device_dir="${AABS_SOURCE_BASE}/${rom_name}/out/target/product/${base_device}"
+    local base_device_name=$(basename ${base_device_dir}/${AABS_BUILD_OUTPUT_MATCH})
+    __aabs_assert $?
+    local base_device_path="${base_device_dir}/$(basename ${base_device_dir}/${AABS_BUILD_OUTPUT_MATCH})"
+    local target_device_path="${AABS_SOURCE_BASE}/${rom_name}/out/target/product/${target_device}"
+
+    if [ ! ${AABS_INCREMENTAL_OPTIONS[${base_device}]+1} -eq 1 ]; then
+        echo "AABS Incremental Build-Patcher does not support \"${base_device}\" yet"
+        echo "To add support, edit"
+        exit 0
+    fi
+
+    declare -A patcher_options=${AABS_INCREMENTAL_OPTIONS[${base_device}]}
+
+    local boot_blkdev=${patcher_options[boot-blkdev]}
+    local system_blkdev=${patcher_options[system-blkdev]}
+    local system_fs=${patcher_options[system-fs]}
+    local system_type=${patcher_options[system-type]}
+    local system_mntpnt=${patcher_options[system-mntpnt]}
+    local system_mntopt=${patcher_options[system-mntopt]}
+
+    # prepare updater-script
+    mkdir -p ${updater_script_dir}
+    __aabs_assert $?
+    echo "ui_print(\" \");" >> ${updater_script}
+    __aabs_assert $?
+    echo "ui_print(\" Incremental Build-Patch created by AABS\");" >> ${updater_script}
+    __aabs_assert $?
+    echo "ui_print(\"    https://github.com/TeamNexus/aabs\");" >> ${updater_script}
+    __aabs_assert $?
+    echo "ui_print(\" \");" >> ${updater_script}
+    __aabs_assert $?
+    echo "ui_print(\" Built for ${rom_name}\");" >> ${updater_script}
+    __aabs_assert $?
+    echo "ui_print(\" \");" >> ${updater_script}
+    __aabs_assert $?
+    echo "ui_print(\" Target-Device: ${target_device}\");" >> ${updater_script}
+    __aabs_assert $?
+    echo "ui_print(\" Patch-Device:  ${patch_device}\");" >> ${updater_script}
+    __aabs_assert $?
+    echo "ui_print(\" Base-Device:   ${base_device}\");" >> ${updater_script}
+    __aabs_assert $?
+    echo "ui_print(\" \");" >> ${updater_script}
+    __aabs_assert $?
+    if [ "${has_system}" == "true" ]; then
+        echo "ui_print(\"   * Mounting /system...\");" >> ${updater_script}
+        __aabs_assert $?
+        echo "mount(\"${system_fs}\", \"${system_type}\", \"${system_blkdev}\", \"${system_mntpnt}\", \"${system_mntopt}\");" >> ${updater_script}
+        __aabs_assert $?
+        echo "ui_print(\"   * Extracting system-files...\");" >> ${updater_script}
+        __aabs_assert $?
+        echo "package_extract_dir(\"system\", \"/system\");" >> ${updater_script}
+        __aabs_assert $?
+    fi
+    if [ "${has_boot}" == "true" ]; then
+        echo "ui_print(\"   * Extracting boot-image to...\");" >> ${updater_script}
+        __aabs_assert $?
+        echo "package_extract_file(\"boot.img\", \"${boot_image}\");" >> ${updater_script}
+        __aabs_assert $?
+    fi
+    echo "ui_print(\" \");" >> ${updater_script}
+    __aabs_assert $?
+    echo "ui_print(\" Finished!\");" >> ${updater_script}
+    __aabs_assert $?
+    echo "ui_print(\" \");" >> ${updater_script}
+    __aabs_assert $?
+    echo "set_progress(1.000000);" >> ${updater_script}
+    __aabs_assert $?
+
+    # prepare updater_binary
+    mkdir -p ${tempdir}/.base
+    __aabs_assert $?
+    unzip ${base_device_path} META-INF/com/google/android/update-binary -d ${tempdir}/.base
+    __aabs_assert $?
+    cp -f ${tempdir}/.base/META-INF/com/google/android/update-binary ${updater_binary}
+    __aabs_assert $?
+    rm -rv ${tempdir}/.base
+    __aabs_assert $?
+
+    # prepare files
+    local patch_file=""
+    for patch_file in "${patch_files[@]}"; do
+        local src="out/target/product/${patch_device}/${patch_file}"
+        local dst="${tempdir}/patch/${patch_file}"
+        if [ "${patch_file:0:1}" == "/" ]; then
+            local filearr=()
+            IFS=':' read -ra filearr <<< "${patch_file:1}"
+
+            local src="${AABS_SOURCE_BASE}/${rom_name}/${filearr[0]}"
+            local dst="${tempdir}/patch/${filearr[1]}"
+        fi
+
+        mkdir -p $(dirname ${dst})
+        __aabs_assert $?
+
+        echo "Copy \"$src\" to \"$dst\""
+        cp -f $src $dst
+        __aabs_assert $?
+    done
+
+    # Repack and copy the build
+    cd ${tempdir}/patch
+    __aabs_assert $?
+    zip -r9 ${tempdir}/${base_device_name} ./*
+    __aabs_assert $?
+    mkdir -p ${target_device_path}
+    __aabs_assert $?
+    cp -f ${tempdir}/${base_device_name} ${target_device_path}
+    __aabs_assert $?
+
+    # Clean up
+    rm -rf ${tempdir}
+    __aabs_assert $?
+}
+
+#
+# Upload the given build to the configured server
+#
+# @param[1]  Name of the ROM which should be used
+# @param[2]  Device-tree whose build should be uploaded
+#
+# @usage     __aabs_upload [ROM-Name] [Device-Tree]
+#
+function __aabs_upload {
+    if [ "${AABS_UPLOAD}" != "true" ] || \
+       [ "${AABS_ARGS_SKIP_UPLOAD}" == "true" ]; then
+        return 0
+    fi
+
+    local rom_name=$1
+    local device=$2
+    local batch_file=$(mktemp "${TMPDIR:-/tmp/}aabs-sftp-batch-XXXXXXXXXXXX")
+
+    echo "Changed directory to ${AABS_SOURCE_BASE}/${rom_name}"
+    cd "${AABS_SOURCE_BASE}/${rom_name}"
+    __aabs_assert $?
+
+    # Prepare dynamic variables
+    local output_artifact_dir="out/target/product/${device}"
+    local output_artifact_path="${output_artifact_dir}/$(basename ${output_artifact_dir}/${AABS_BUILD_OUTPUT_MATCH})"
+    local upload_dir="${AABS_UPLOAD_BASEDIR}/${rom_name}/${device}"
+    local upload_file="${rom_name}-${device}-$(date -r ${output_artifact_path} +%Y-%m-%d)_$(date -r ${output_artifact_path} +%H%M).zip"
+
+    # could be required by depending device-trees
+    local export_upload_file_varname="aabs_upload_file_${device}"
+    export $export_upload_file_varname="${upload_file}"
+
+    echo "cd ${upload_dir}" >> $batch_file
+    __aabs_assert $?
+    echo "put ${output_artifact_path} .${upload_file}" >> $batch_file
+    __aabs_assert $?
+    echo "rename .${upload_file} ${upload_file}" >> $batch_file
+    __aabs_assert $?
+    echo "exit" >> $batch_file
+    __aabs_assert $?
+
+    sshpass -p "${AABS_UPLOAD_PASS}" ssh -p$AABS_UPLOAD_PORT $AABS_UPLOAD_USER@$AABS_UPLOAD_HOST "mkdir -p ${upload_dir}"
+    __aabs_assert $?
+    sshpass -p "${AABS_UPLOAD_PASS}" sftp -P$AABS_UPLOAD_PORT -oBatchMode=no -b$batch_file $AABS_UPLOAD_USER@$AABS_UPLOAD_HOST
+    __aabs_assert $?
+}
+
+#
+# Upload the patch and symlink the base-build on the configured server
+#
+# @param[1]  Name of the ROM which should be used
+# @param[2]  Device-tree whose patch should be uploaded
+# @param[3]  The device-tree this patch depends on
+#
+# @usage     __aabs_upload_patch [ROM-Name] [Device-Tree] [Base Device-Tree]
+#
+function __aabs_upload_patch {
+    if [ "${AABS_UPLOAD}" != "true" ] || \
+       [ "${AABS_ARGS_SKIP_UPLOAD}" == "true" ]; then
+        return 0
+    fi
+
+    local rom_name=$1
+    local device=$2
+    local base_device=$3
+    local batch_file=$(mktemp "${TMPDIR:-/tmp/}aabs-sftp-batch-XXXXXXXXXXXX")
+
+    echo "Changed directory to ${AABS_SOURCE_BASE}/${rom_name}"
+    cd "${AABS_SOURCE_BASE}/${rom_name}"
+    __aabs_assert $?
+
+    # Prepare dynamic variables
+    local upload_patch_file="${rom_name}-${device}-$(date +%Y-%m-%d)_$(date +%H%M)-patch.zip"
+    local output_artifact_dir="out/target/product/${device}"
+    local output_artifact_path="${output_artifact_dir}/$(basename ${output_artifact_dir}/${AABS_BUILD_OUTPUT_MATCH})"
+    local upload_dir="${AABS_UPLOAD_BASEDIR}/${rom_name}/${device}"
+    local upload_file="${rom_name}-${device}-$(date -r ${output_artifact_path} +%Y-%m-%d)_$(date -r ${output_artifact_path} +%H%M).zip"
+
+    # Get filename of base-device
+    local base_output_artifact_dir="out/target/product/${base_device}"
+    local base_output_artifact_path="${base_output_artifact_dir}/$(basename ${base_output_artifact_dir}/${AABS_BUILD_OUTPUT_MATCH})"
+    local base_upload_dir="${AABS_UPLOAD_BASEDIR}/${rom_name}/${base_device}"
+    local base_upload_file="${rom_name}-${base_device}-$(date -r ${base_output_artifact_path} +%Y-%m-%d)_$(date -r ${base_output_artifact_path} +%H%M).zip"
+
+    echo "cd ${upload_dir}" >> $batch_file
+    __aabs_assert $?
+    echo "put ${output_artifact_path} .${upload_patch_file}" >> $batch_file
+    __aabs_assert $?
+    echo "rename .${upload_patch_file} ${upload_patch_file}" >> $batch_file
+    __aabs_assert $?
+    echo "symlink ${base_upload_dir}/${base_upload_file} ${upload_file}" >> $batch_file
+    __aabs_assert $?
+    echo "exit" >> $batch_file
+    __aabs_assert $?
+
+    sshpass -p "${AABS_UPLOAD_PASS}" ssh -p$AABS_UPLOAD_PORT $AABS_UPLOAD_USER@$AABS_UPLOAD_HOST "mkdir -p ${upload_dir}"
+    __aabs_assert $?
+    sshpass -p "${AABS_UPLOAD_PASS}" sftp -P$AABS_UPLOAD_PORT -oBatchMode=no -b$batch_file $AABS_UPLOAD_USER@$AABS_UPLOAD_HOST
+    __aabs_assert $?
+}
+
+function __aabs_check_rom {
+    local check_rom=$1
+    local rom=""
+
+    for rom in "${AABS_ARGS_ROMS[@]}"; do
+        if [ "${rom}" == "-${check_rom}" ]; then
+            return 1
+        fi
+    done
+
+    if [ "${AABS_ARGS_ROMS}" == "*" ]; then
+        return 0
+    fi
+
+    for rom in "${AABS_ARGS_ROMS[@]}"; do
+        if [ "${rom}" == "${check_rom}" ] || \
+           [ "${rom}" == "*" ]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+function __aabs_check_device {
+    local check_device=$1
+    local device=""
+
+    for device in "${AABS_ARGS_DEVICES[@]}"; do
+        if [ "${device}" == "-${check_device}" ]; then
+            return 1
+        fi
+    done
+
+    if [ "${AABS_ARGS_DEVICES}" == "*" ]; then
+        return 0
+    fi
+
+    for device in "${AABS_ARGS_DEVICES[@]}"; do
+        if [ "${device}" == "${check_device}" ] || \
+           [ "${device}" == "*" ]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+#
+# Validate the passed return-code
+#
+# @param[1]  Return-code to validate
+#
+# @usage     __assert__ $?
+#
+function __aabs_assert {
+    local return_code=$1
+
+    if [ ! ${return_code} -eq 0 ]; then
+        echo "Previous command exited with ${return_code}"
+        exit ${return_code}
+    fi
+}
+
+# Prepare application-global options
+AABS_BASEDIR="$(dirname $0)"
+
+# Parse cmdline-options
+TEMP=`getopt -o S,U,d::,r:: --long skip-sync,skip-upload,devices::,roms:: -n 'aabs' -- "$@"`
+eval set -- "$TEMP"
+
+# Set initial options
+AABS_ARGS_SKIP_SYNC="false"
+AABS_ARGS_SKIP_UPLOAD="false"
+AABS_ARGS_DEVICES="*"
+AABS_ARGS_ROMS="*"
+
+# extract options and their arguments into variables.
+while true ; do
+    case "$1" in
+        -d|--devices)
+            case "$2" in
+                "") AABS_ARGS_DEVICES="*" ; shift 2 ;;
+                *) AABS_ARGS_DEVICES=$2 ; shift 2 ;;
+            esac ;;
+        -r|--roms)
+            case "$2" in
+                "") AABS_ARGS_ROMS="*" ; shift 2 ;;
+                *) AABS_ARGS_ROMS=$2 ; shift 2 ;;
+            esac ;;
+        -S|--skip-sync) AABS_ARGS_SKIP_SYNC="true" ; shift ;;
+        -U|--skip-upload) AABS_ARGS_SKIP_UPLOAD="true" ; shift ;;
+        --) shift ; break ;;
+        *) echo "Failed to parse arguments" ; exit 1 ;;
+    esac
+done
+
+# parse the passed options
+if [ "${AABS_ARGS_DEVICES}" != "*" ]; then
+    IFS=' ' read -ra AABS_ARGS_DEVICES <<< "$AABS_ARGS_DEVICES"
+fi
+if [ "${AABS_ARGS_ROMS}" != "*" ]; then
+    IFS=' ' read -ra AABS_ARGS_ROMS <<< "$AABS_ARGS_ROMS"
+fi
+
+# include default configuration and then
+# user-configuration to allow user to override
+# some options
+source "${AABS_BASEDIR}/aabs.config"
+source "aabs.config"
+
+# Start program
+__aabs_main
