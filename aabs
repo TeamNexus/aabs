@@ -352,9 +352,9 @@ function __aabs_incremental_patch {
         __aabs_assert $?
     fi
     if [ "${has_boot}" == "true" ]; then
-        echo "ui_print(\"   * Extracting boot-image to...\");" >> ${updater_script}
+        echo "ui_print(\"   * Extracting boot-image...\");" >> ${updater_script}
         __aabs_assert $?
-        echo "package_extract_file(\"boot.img\", \"${boot_image}\");" >> ${updater_script}
+        echo "package_extract_file(\"boot.img\", \"${boot_blkdev}\");" >> ${updater_script}
         __aabs_assert $?
     fi
     echo "ui_print(\" \");" >> ${updater_script}

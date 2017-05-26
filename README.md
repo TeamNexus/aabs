@@ -8,12 +8,17 @@ Getting started
 Download the minimal aabs-autorun script from GitHub
 
 	git clone https://github.com/TeamNexus/aabs ./aabs/
-	cp ./aabs/aabs.config-example ./aabs.config
+	cp ./aabs/aabs.config ./aabs.config
 	chmod +x ./aabs/aabs
 
 If you want to, you can edit the configs to your needs.
 When you are finished, run "./aabs/aabs" and all devices
 and models available on the TeamNexus-repo will be built.
+
+Command Line-Options
+==========
+
+	-d|--devices		
 
 License
 ==========
