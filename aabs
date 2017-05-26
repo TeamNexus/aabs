@@ -434,11 +434,16 @@ function __aabs_upload {
     cd "${AABS_SOURCE_BASE}/${rom_name}"
     __aabs_assert $?
 
+    # Prepare upload-basedir
+    local expanded_upload_basedir="${AABS_UPLOAD_BASEDIR}"
+    local expanded_upload_basedir=$(echo "$expanded_upload_basedir" | sed -r "s/%date%/${AABS_START_DATE}/g")
+    local expanded_upload_basedir=$(echo "$expanded_upload_basedir" | sed -r "s/%time%/${AABS_START_TIME}/g")
+
     # Prepare dynamic variables
     local output_artifact_dir="out/target/product/${device}"
     local output_artifact_path="${output_artifact_dir}/$(basename ${output_artifact_dir}/${AABS_BUILD_OUTPUT_MATCH})"
-    local upload_dir="${AABS_UPLOAD_BASEDIR}/${rom_name}/${device}"
-    local upload_file="${rom_name}-${device}-$(date -r ${output_artifact_path} +%Y-%m-%d)_$(date -r ${output_artifact_path} +%H%M).zip"
+    local upload_dir="${expanded_upload_basedir}/${rom_name}/${device}"
+    local upload_file="${rom_name}-${device}-${AABS_START_DATE}_${AABS_START_TIME}.zip"
 
     # could be required by depending device-trees
     local export_upload_file_varname="aabs_upload_file_${device}"
@@ -483,18 +488,23 @@ function __aabs_upload_patch {
     cd "${AABS_SOURCE_BASE}/${rom_name}"
     __aabs_assert $?
 
+    # Prepare upload-basedir
+    local expanded_upload_basedir="${AABS_UPLOAD_BASEDIR}"
+    local expanded_upload_basedir=$(echo "$expanded_upload_basedir" | sed -r "s/%date%/${AABS_START_DATE}/g")
+    local expanded_upload_basedir=$(echo "$expanded_upload_basedir" | sed -r "s/%time%/${AABS_START_TIME}/g")
+
     # Prepare dynamic variables
-    local upload_patch_file="${rom_name}-${device}-$(date +%Y-%m-%d)_$(date +%H%M)-patch.zip"
+    local upload_patch_file="${rom_name}-${device}-${AABS_START_DATE}_${AABS_START_TIME}-patch.zip"
     local output_artifact_dir="out/target/product/${device}"
     local output_artifact_path="${output_artifact_dir}/$(basename ${output_artifact_dir}/${AABS_BUILD_OUTPUT_MATCH})"
-    local upload_dir="${AABS_UPLOAD_BASEDIR}/${rom_name}/${device}"
-    local upload_file="${rom_name}-${device}-$(date -r ${output_artifact_path} +%Y-%m-%d)_$(date -r ${output_artifact_path} +%H%M).zip"
+    local upload_dir="${expanded_upload_basedir}/${rom_name}/${device}"
+    local upload_file="${rom_name}-${device}-${AABS_START_DATE}_${AABS_START_TIME}.zip"
 
     # Get filename of base-device
     local base_output_artifact_dir="out/target/product/${base_device}"
     local base_output_artifact_path="${base_output_artifact_dir}/$(basename ${base_output_artifact_dir}/${AABS_BUILD_OUTPUT_MATCH})"
     local base_upload_dir="${AABS_UPLOAD_BASEDIR}/${rom_name}/${base_device}"
-    local base_upload_file="${rom_name}-${base_device}-$(date -r ${base_output_artifact_path} +%Y-%m-%d)_$(date -r ${base_output_artifact_path} +%H%M).zip"
+    local base_upload_file="${rom_name}-${base_device}-${AABS_START_DATE}_${AABS_START_TIME}.zip"
 
     echo "cd ${upload_dir}" >> $batch_file
     __aabs_assert $?
@@ -579,6 +589,8 @@ function __aabs_assert {
 
 # Prepare application-global options
 AABS_BASEDIR="$(dirname $0)"
+AABS_START_DATE="$(date +%Y-%m-%d)"
+AABS_START_TIME="$(date +%H%M)"
 
 # Parse cmdline-options
 TEMP=`getopt -o S,U,d::,r:: --long skip-sync,skip-upload,devices::,roms:: -n 'aabs' -- "$@"`
