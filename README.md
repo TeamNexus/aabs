@@ -18,7 +18,10 @@ and models available on the TeamNexus-repo will be built.
 Command Line-Options
 ==========
 
-	-d|--devices		
+	-d|--devices		List of devices which should be built, seperated by a single space. Default: * to build all devices
+	-r|--roms			List of ROMs which should be built, seperated by a single space. Default: * to build all ROMs
+	-S|--skip-sync		Flag, which tells the build-system to skip "repo sync". Default: false
+	-U|--skip-upload	Flag, which tells the build-system to skip the build-uploads. Default: false
 
 License
 ==========
