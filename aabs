@@ -346,6 +346,10 @@ function __aabs_incremental_patch {
         __aabs_assert $?
         echo "package_extract_dir(\"system\", \"/system\");" >> ${updater_script}
         __aabs_assert $?
+        echo "ui_print(\"   * Unmounting /system...\");" >> ${updater_script}
+        __aabs_assert $?
+        echo "unmount(\"/system\");" >> ${updater_script}
+        __aabs_assert $?
     fi
     if [ "${has_boot}" == "true" ]; then
         echo "ui_print(\"   * Extracting boot-image...\");" >> ${updater_script}
