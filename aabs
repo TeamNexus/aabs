@@ -89,20 +89,20 @@ function __aabs_build {
     __aabs_upload ${rom_name} "zerofltexx"
 
     __aabs_build_target ${rom_name} "zeroltexx"   "bootimage"
-    __aabs_patch ${rom_name} "zeroltexx" "zeroltexx" "zerofltexx" \
+    __aabs_patch ${rom_name} "zeroltexx" "zerofltexx" \
         "boot.img"
     __aabs_upload_patch ${rom_name} "zeroltexx" "zerofltexx"
 
     __aabs_build_target ${rom_name} "zerofltecan" "bootimage audio.primary.universal7420 audio.primary.universal7420_32"
-    __aabs_patch ${rom_name} "zerofltecan" "zerofltecan" "zerofltexx" \
+    __aabs_patch ${rom_name} "zerofltecan" "zerofltexx" \
         "boot.img" \
         "system/lib/hw/audio.primary.universal7420.so" \
         "system/lib64/hw/audio.primary.universal7420.so" \
         "/device/samsung/zeroltecan/configs/audio/mixer_paths_0.xml:system/etc/mixer_paths_0.xml"
     __aabs_upload_patch ${rom_name} "zerofltecan" "zerofltexx"
 
-    __aabs_build_target ${rom_name} "zeroltecan"  "bootimage"
-    __aabs_patch ${rom_name} "zeroltecan" "zerofltecan" "zerofltexx" \
+    __aabs_build_target ${rom_name} "zeroltecan"  "bootimage audio.primary.universal7420 audio.primary.universal7420_32"
+    __aabs_patch ${rom_name} "zeroltecan" "zerofltexx" \
         "boot.img" \
         "system/lib/hw/audio.primary.universal7420.so" \
         "system/lib64/hw/audio.primary.universal7420.so" \
@@ -178,11 +178,10 @@ function __aabs_patch {
 
     local rom_name=$1
     local target_device=$2
-    local patch_device=$3
-    local base_device=$4
+    local base_device=$3
     local tempdir=$(mktemp -d "${TMPDIR:-/tmp/}aabs-patchdir-XXXXXXXXXXXX")
 
-    shift 4; local patch_files=( "$@" )
+    shift 3; local patch_files=( "$@" )
 
     # check if device is disabled
     __aabs_check_device $target_device
@@ -209,7 +208,7 @@ function __aabs_patch {
     # prepare files
     local patch_file=""
     for patch_file in "${patch_files[@]}"; do
-        local src="out/target/product/${patch_device}/${patch_file}"
+        local src="out/target/product/${target_device}/${patch_file}"
         local dst="${tempdir}/patch/${patch_file}"
         if [ "${patch_file:0:1}" == "/" ]; then
             local filearr=()
@@ -262,14 +261,13 @@ function __aabs_patch {
 function __aabs_incremental_patch {
     local rom_name=$1
     local target_device=$2
-    local patch_device=$3
-    local base_device=$4
+    local base_device=$3
     local tempdir=$(mktemp -d "${TMPDIR:-/tmp/}aabs-patchdir-XXXXXXXXXXXX")
 
     local has_boot="false"
     local has_system="false"
 
-    shift 4; local patch_files=( "$@" )
+    shift 3; local patch_files=( "$@" )
 
     # check if device is disabled
     __aabs_check_device $target_device
@@ -335,8 +333,6 @@ function __aabs_incremental_patch {
     __aabs_assert $?
     echo "ui_print(\" Target-Device: ${target_device}\");" >> ${updater_script}
     __aabs_assert $?
-    echo "ui_print(\" Patch-Device:  ${patch_device}\");" >> ${updater_script}
-    __aabs_assert $?
     echo "ui_print(\" Base-Device:   ${base_device}\");" >> ${updater_script}
     __aabs_assert $?
     echo "ui_print(\" \");" >> ${updater_script}
@@ -379,7 +375,7 @@ function __aabs_incremental_patch {
     # prepare files
     local patch_file=""
     for patch_file in "${patch_files[@]}"; do
-        local src="out/target/product/${patch_device}/${patch_file}"
+        local src="out/target/product/${target_device}/${patch_file}"
         local dst="${tempdir}/patch/${patch_file}"
         if [ "${patch_file:0:1}" == "/" ]; then
             local filearr=()
@@ -429,6 +425,18 @@ function __aabs_upload {
     local rom_name=$1
     local device=$2
     local batch_file=$(mktemp "${TMPDIR:-/tmp/}aabs-sftp-batch-XXXXXXXXXXXX")
+
+    # check if ROM is disabled
+    __aabs_check_rom $rom_name
+    if [ $? -eq 1 ]; then
+        return 1
+    fi
+
+    # check if device is disabled
+    __aabs_check_device $device
+    if [ $? -eq 1 ]; then
+        return 1
+    fi
 
     echo "Changed directory to ${AABS_SOURCE_BASE}/${rom_name}"
     cd "${AABS_SOURCE_BASE}/${rom_name}"
@@ -484,6 +492,18 @@ function __aabs_upload_patch {
     local base_device=$3
     local batch_file=$(mktemp "${TMPDIR:-/tmp/}aabs-sftp-batch-XXXXXXXXXXXX")
 
+    # check if ROM is disabled
+    __aabs_check_rom $rom_name
+    if [ $? -eq 1 ]; then
+        return 1
+    fi
+
+    # check if device is disabled
+    __aabs_check_device $device
+    if [ $? -eq 1 ]; then
+        return 1
+    fi
+
     echo "Changed directory to ${AABS_SOURCE_BASE}/${rom_name}"
     cd "${AABS_SOURCE_BASE}/${rom_name}"
     __aabs_assert $?
@@ -503,7 +523,7 @@ function __aabs_upload_patch {
     # Get filename of base-device
     local base_output_artifact_dir="out/target/product/${base_device}"
     local base_output_artifact_path="${base_output_artifact_dir}/$(basename ${base_output_artifact_dir}/${AABS_BUILD_OUTPUT_MATCH})"
-    local base_upload_dir="${AABS_UPLOAD_BASEDIR}/${rom_name}/${base_device}"
+    local base_upload_dir="${expanded_upload_basedir}/${rom_name}/${base_device}"
     local base_upload_file="${rom_name}-${base_device}-${AABS_START_DATE}_${AABS_START_TIME}.zip"
 
     echo "cd ${upload_dir}" >> $batch_file
