@@ -293,7 +293,7 @@ function __aabs_incremental_patch {
 
     # Prepare dynamic variables
     local updater_script_dir="${tempdir}/patch/META-INF/com/google/android"
-    local updater_binary="${updater_script_dir}/updater-binary"
+    local updater_binary="${updater_script_dir}/update-binary"
     local updater_script="${updater_script_dir}/updater-script"
 
     # Prepare dynamic base-device variables
