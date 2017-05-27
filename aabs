@@ -69,7 +69,7 @@ repo sync -c -d --force-sync --no-clone-bundle --jobs=<?php echo AABS_SYNC_JOBS;
         __cmd_end();
     }
 
-    function aabs_build($rom, $device, $targets = "bacon", $clobber = AABS_SOURCE_CLOBBER) {
+    function aabs_build($rom, $main_device, $targets_combinations) {
         // check if ROM is disabled
         if (AABS_ROMS != "*" && strpos(AABS_ROMS, "{$rom} ") === false) {
             return;
@@ -80,20 +80,36 @@ repo sync -c -d --force-sync --no-clone-bundle --jobs=<?php echo AABS_SYNC_JOBS;
             return;
         }
 
+        $output_match_path = "out/target/product/{$main_device}/" . AABS_BUILD_OUTPUT_MATCH;
+
         __cmd();
 ?>#!/bin/bash
 
 cd "<?php echo AABS_SOURCE_BASEDIR . "/{$rom}"; ?>"
 
 source build/envsetup.sh
+
+rm -fv <?php echo $output_match_path; ?>
+
+rm -fv <?php echo $output_match_path; ?>.bak
+
+<?php
+    foreach($targets_combinations as $device => $cmd) {
+        $targets = isset($cmd['targets']) ? $cmd['targets'] : "bacon";
+        $clobber = isset($cmd['clobber']) ? $cmd['clobber'] : false;
+        $jobs = isset($cmd['jobs']) ? $cmd['jobs'] : AABS_BUILD_JOBS;
+?>
+
 lunch lineage_<?php echo $device; ?>-userdebug
 
-rm -fv out/target/product/<?php echo AABS_BUILD_OUTPUT_MATCH; ?>
-rm -fv out/target/product/<?php echo AABS_BUILD_OUTPUT_MATCH; ?>.bak
+<?php if ($clobber) { ?>
+make clobber -j<?php echo $jobs; ?>
+<?php } ?>
 
-<?php if ($clobber) { ?>make clobber -j<?php echo AABS_BUILD_JOBS; ?><?php } ?>
+make <?php echo $targets;?> -j<?php echo $jobs; ?>
 
-make <?php echo $targets;?> -j<?php echo AABS_BUILD_JOBS; ?>
+<?php } ?>
+
 <?php
         __cmd_end();
     }
@@ -246,7 +262,7 @@ make <?php echo $targets;?> -j<?php echo AABS_BUILD_JOBS; ?>
             "ui_print(\"  _______ _______ ______   ______\");\n" .
             "ui_print(\" (_______|_______|____  \ / _____)\");\n" .
             "ui_print(\"  _______ _______ ____)  | (____\");\n" .
-            "ui_print(\" |  ___  |  ___  |  __  ( \____ \\\");\n" .
+            "ui_print(\" |  ___  |  ___  |  __  ( \____ \\\\\");\n" .
             "ui_print(\" | |   | | |   | | |__)  )_____) )\");\n" .
             "ui_print(\" |_|   |_|_|   |_|______/(______/\");\n" .
             "ui_print(\" \");\n" .
@@ -294,6 +310,9 @@ make <?php echo $targets;?> -j<?php echo AABS_BUILD_JOBS; ?>
                 $upload_dir_len = strlen($upload_dir);
             }
         }
+        $upload_dir = str_replace("{ROM}", $rom, $upload_dir);
+        $upload_dir = str_replace("{DEVICE}", $device, $upload_dir);
+        $upload_dir = str_replace("{SHORT_DEVICE}", $short_device, $upload_dir);
 
         $upload_file     = AABS_UPLOAD_FILE;
         $upload_file_len = strlen($upload_file);
@@ -303,11 +322,14 @@ make <?php echo $targets;?> -j<?php echo AABS_BUILD_JOBS; ?>
                 $upload_file_len = strlen($upload_file);
             }
         }
+        $upload_file = str_replace("{ROM}", $rom, $upload_file);
+        $upload_file = str_replace("{DEVICE}", $device, $upload_file);
+        $upload_file = str_replace("{SHORT_DEVICE}", $short_device, $upload_file);
 
         $sftp_batch_file = tempnam(sys_get_temp_dir(), 'aabs-sftp-batch-');
         $sftp_batch      = "cd {$upload_dir}\n";
-        $sftp_batch     .= "put {$output_path} .{$output_name}\n";
-        $sftp_batch     .= "rename .{$output_path} {$output_name}\n";
+        $sftp_batch     .= "put {$output_path} .{$upload_file}\n";
+        $sftp_batch     .= "rename .{$upload_file} {$upload_file}\n";
         $sftp_batch     .= "exit\n";
         file_put_contents($sftp_batch_file, $sftp_batch);
 

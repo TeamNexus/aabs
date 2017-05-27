@@ -13,10 +13,20 @@
         }
 
         // Samsung Galaxy S6 (zero, SM-G92xx)
-        aabs_build($rom, "zerofltexx", "bacon");
-        aabs_build($rom, "zeroltexx", "bootimage", false);
-        aabs_build($rom, "zerofltecan", "bootimage audio.primary.universal7420_32 audio.primary.universal7420", false);
-        aabs_build($rom, "zeroltecan", "bootimage audio.primary.universal7420_32 audio.primary.universal7420", false);
+        /* aabs_build($rom, "zerofltexx", array(
+            'zerofltexx' => array(
+                'clobber' => AABS_SOURCE_CLOBBER,
+            ),
+            'zeroltexx' => array(
+                'targets' => "bootimage",
+            ),
+            'zerofltecan' => array(
+                'targets' => "bootimage audio.primary.universal7420_32 audio.primary.universal7420",
+            ),
+            'zeroltecan' => array(
+                'targets' => "bootimage audio.primary.universal7420_32 audio.primary.universal7420",
+            )
+        ));
         aabs_patch($rom, array( "zerofltexx", "zeroflte" ), array(
             'zeroltexx' => array(
                 'alias' => array( 'zerolte' ),
@@ -42,6 +52,6 @@
                     array( "device/samsung/zeroltecan/configs/audio/mixer_paths_0.xml", "system/etc/mixer_paths_0.xml" ),
                 ),
             ),
-        ));
+        )); */
         aabs_upload($rom, "zero", "zerofltexx");
     }
