@@ -95,6 +95,11 @@ rm -fv <?php echo $output_match_path; ?>.bak
 
 <?php
     foreach($targets_combinations as $device => $cmd) {
+        // check if device is disabled
+        if (AABS_DEVICES != "*" && strpos(AABS_DEVICES, "{$device} ") === false) {
+            continue;
+        }
+
         $targets = isset($cmd['targets']) ? $cmd['targets'] : "bacon";
         $clobber = isset($cmd['clobber']) ? $cmd['clobber'] : false;
         $jobs = isset($cmd['jobs']) ? $cmd['jobs'] : AABS_BUILD_JOBS;
@@ -146,6 +151,11 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
 
         $script_targets = array( );
         foreach ($targets as $target_device => $target_options) {
+            // check if device is disabled
+            if (AABS_DEVICES != "*" && strpos(AABS_DEVICES, "{$device} ") === false) {
+                continue;
+            }
+
             $target_out_dir   = "{$source_dir}/out/target/product/{$target_device}";
             $target_patch_dir = "{$tmp}/patches/{$target_device}";
 
