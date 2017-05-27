@@ -13,7 +13,7 @@
         }
 
         // Samsung Galaxy S6 (zero, SM-G92xx)
-        /* aabs_build($rom, "zerofltexx", array(
+        aabs_build($rom, "zerofltexx", array(
             'zerofltexx' => array(
                 'clobber' => AABS_SOURCE_CLOBBER,
             ),
@@ -52,6 +52,6 @@
                     array( "device/samsung/zeroltecan/configs/audio/mixer_paths_0.xml", "system/etc/mixer_paths_0.xml" ),
                 ),
             ),
-        )); */
+        ));
         aabs_upload($rom, "zero", "zerofltexx");
     }

@@ -257,7 +257,8 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
         $updater_script =
             "assert({$updater_script_asserts});\n" .
             "ui_print(\" \");\n" .
-            "ui_print(\"     Prepared and patched with    \");\n" .
+            "ui_print(\" \");\n" .
+            "ui_print(\" Prepared and patched with    \");\n" .
             "ui_print(\" \");\n" .
             "ui_print(\"  _______ _______ ______   ______\");\n" .
             "ui_print(\" (_______|_______|____  \ / _____)\");\n" .
@@ -268,9 +269,12 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
             "ui_print(\" \");\n" .
             "ui_print(\" https://github.com/TeamNexus/aabs\");\n" .
             "ui_print(\" \");\n" .
-            "ui_print(\" ROM-Name:    {$rom}\");\n" .
-            "ui_print(\" Base-Device: {$device}\");\n" .
-            "ui_print(\" Timestamp:   " . date("Y-m-d H:i:s", AABS_START_TIME) . "\");\n" .
+            "ui_print(\" \");\n" .
+            "ui_print(\" *********************************\");\n" .
+            "ui_print(\"  ROM-Name:    {$rom}\");\n" .
+            "ui_print(\"  Base-Device: {$device}\");\n" .
+            "ui_print(\"  Timestamp:   " . date("Y-m-d H:i:s", AABS_START_TIME) . "\");\n" .
+            "ui_print(\" *********************************\");\n" .
             "ui_print(\" \");\n" .
             $updater_script;
 
