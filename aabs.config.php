@@ -71,6 +71,13 @@
         define('AABS_UPLOAD', true);
 
     /*
+     * Type of upload-method ("ftp" or "sftp")
+     * @default ftp
+     */
+    if (!defined('AABS_UPLOAD_TYPE'))
+		define('AABS_UPLOAD_TYPE', "ftp");
+
+    /*
      * Hostname or IP of the upload-server
      * @default "server.exmaple.com"
      */

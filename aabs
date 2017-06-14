@@ -87,6 +87,9 @@ repo sync -c -d --force-sync --no-clone-bundle --jobs=<?php echo AABS_SYNC_JOBS;
 
 cd "<?php echo AABS_SOURCE_BASEDIR . "/{$rom}"; ?>"
 
+export RR_BUILDTYPE=Unofficial
+export WITH_ROOT_METHOD="magisk"
+
 source build/envsetup.sh
 
 rm -fv <?php echo $output_match_path; ?>
@@ -361,17 +364,77 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
         $upload_file = str_replace("{DEVICE}", $device, $upload_file);
         $upload_file = str_replace("{SHORT_DEVICE}", $short_device, $upload_file);
 
-        $sftp_batch_file = tempnam(sys_get_temp_dir(), 'aabs-sftp-batch-');
-        $sftp_batch      = "cd {$upload_dir}\n";
-        $sftp_batch     .= "put {$output_path} .{$upload_file}\n";
-        $sftp_batch     .= "rename .{$upload_file} {$upload_file}\n";
-        $sftp_batch     .= "exit\n";
-        file_put_contents($sftp_batch_file, $sftp_batch);
+		echo "\n";
+		echo "\n";
 
-        $sshpass = "sshpass -p\"" . AABS_UPLOAD_PASS . "\"";
-        $remote  = AABS_UPLOAD_USER . "@" . AABS_UPLOAD_HOST;
-        __exec($sshpass . " ssh -p" . AABS_UPLOAD_PORT . " {$remote} mkdir -p {$upload_dir}", array( AABS_UPLOAD_PASS ));
-        __exec($sshpass . " sftp -P" . AABS_UPLOAD_PORT . " -oBatchMode=no -b{$sftp_batch_file} {$remote}", array( AABS_UPLOAD_PASS ));
+		switch (AABS_UPLOAD_TYPE) {
+			case "sftp":
+
+				echo "Connecting to " . AABS_UPLOAD_HOST . ":" . AABS_UPLOAD_PORT . "...\n";
+				if (!$ssh_conn = ssh2_connect(AABS_UPLOAD_HOST, AABS_UPLOAD_PORT))
+					die("aabs_upload: failed to establish connection to " . AABS_UPLOAD_HOST . ":" . AABS_UPLOAD_PORT);
+
+				echo "Authenicating...\n";
+				if (!ssh2_auth_password($ssh_conn, AABS_UPLOAD_USER, AABS_UPLOAD_PASS))
+					die("aabs_upload: failed to login to " . AABS_UPLOAD_HOST . ":" . AABS_UPLOAD_PORT . " (Using password: " . (AABS_UPLOAD_PASS == "" ? "no" : "yes") . ")");
+
+				echo "Creating SFTP-session...\n";
+				if (!$sftp_conn = ssh2_sftp($connection))
+					die("aabs_upload: failed to create a SFTP-session");
+
+				echo "Creating upload-directory...\n";
+				if (!ssh2_exec($ssh_conn, "mkdir -p \"{$upload_dir}\""))
+					die("aabs_upload: failed to create upload-directory");
+
+				$remote_stream = @fopen("ssh2.sftp://$sftp_conn$upload_dir/.$upload_file", 'w');
+				$local_stream  = @fopen($output_path, 'r');
+
+				if (!flock($local_stream, LOCK_SH))
+					die("aabs_upload: failed to acquire lock for local file");
+
+				$total   = filesize($output_path);
+				$current = 0;
+
+				echo "\rUploading {$current} / {$total}...";
+
+				while(!feof($local_stream)) {
+					$buffer = fread($local_stream, 8192);
+					fwrite($remote_stream, $buffer, strlen($buffer));
+
+					$current += strlen($buffer);
+					echo "\rUploading {$current} / {$total}...";
+				}
+				fflush($remote_stream);
+
+				fclose($remote_stream);
+				fclose($local_stream);
+
+				echo "\nFinished!";
+				break;
+
+			case "ftp":
+
+				echo "Connecting to " . AABS_UPLOAD_HOST . ":" . AABS_UPLOAD_PORT . "...\n";
+				if (!$ftp_conn = ftp_ssl_connect(AABS_UPLOAD_HOST, AABS_UPLOAD_PORT))
+					die("aabs_upload: failed to establish connection to " . AABS_UPLOAD_HOST . ":" . AABS_UPLOAD_PORT);
+
+				echo "Authenicating...\n";
+				if (!ftp_login($ftp_conn, AABS_UPLOAD_USER, AABS_UPLOAD_PASS))
+					die("aabs_upload: failed to login to " . AABS_UPLOAD_HOST . ":" . AABS_UPLOAD_PORT . " (Using password: " . (AABS_UPLOAD_PASS == "" ? "no" : "yes") . ")");
+
+				echo "Switching to passive-mode...\n";
+				if (!ftp_pasv($ftp_conn, true))
+					die("aabs_upload: failed to switch to passive-mode");
+				
+				echo "Uploading...\n";
+				if (!ftp_put($ftp_conn, "${upload_dir}/.${upload_file}", $output_path, FTP_BINARY))
+					die("aabs_upload: failed to upload build");
+
+				break;
+		}
+
+		echo "\n";
+		echo "\n";
     }
 
     function __cmd() {
