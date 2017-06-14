@@ -4,18 +4,18 @@
     aabs_sync("ResurrectionRemix");
     aabs_sync("AOKP");
 
-    build_rom("NexusOS");
-    build_rom("ResurrectionRemix");
-    build_rom("AOKP");
+    build_rom("NexusOS", "lineage");
+    build_rom("ResurrectionRemix", "lineage");
+    build_rom("AOKP", "aokp");
 
-    function build_rom($rom) {
+    function build_rom($rom, $device_prefix) {
         // check if ROM is disabled
         if (AABS_ROMS != "*" && strpos(AABS_ROMS, "{$rom} ") === false) {
             return;
         }
 
         // Samsung Galaxy S6 (zero, SM-G92xx)
-        aabs_build($rom, "zerofltexx", array(
+        aabs_build($rom, $device_prefix, "zerofltexx", array(
             'zerofltexx' => array(
                 'clobber' => AABS_SOURCE_CLOBBER,
             ),

@@ -69,7 +69,7 @@ repo sync -c -d --force-sync --no-clone-bundle --jobs=<?php echo AABS_SYNC_JOBS;
         __cmd_end();
     }
 
-    function aabs_build($rom, $main_device, $targets_combinations) {
+    function aabs_build($rom, $device_prefix, $main_device, $targets_combinations) {
         // check if ROM is disabled
         if (AABS_ROMS != "*" && strpos(AABS_ROMS, "{$rom} ") === false) {
             return;
@@ -108,7 +108,7 @@ rm -fv <?php echo $output_match_path; ?>.bak
         $jobs = isset($cmd['jobs']) ? $cmd['jobs'] : AABS_BUILD_JOBS;
 ?>
 
-lunch lineage_<?php echo $device; ?>-userdebug
+lunch <?php echo $device_prefix; ?>_<?php echo $device; ?>-userdebug
 
 <?php if ($clobber) { ?>
 make clobber -j<?php echo $jobs; ?>
@@ -409,6 +409,10 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
 				fclose($remote_stream);
 				fclose($local_stream);
 
+				echo "Make build visible...\n";
+				if (!ssh2_exec($ssh_conn, "mv \"$upload_dir/.$upload_file\" \"$upload_dir/$upload_file\""))
+					die("aabs_upload: failed to rename uploaded build-file");
+
 				echo "\nFinished!";
 				break;
 
@@ -430,6 +434,11 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
 				if (!ftp_put($ftp_conn, "${upload_dir}/.${upload_file}", $output_path, FTP_BINARY))
 					die("aabs_upload: failed to upload build");
 
+				echo "Make build visible...\n";
+				if (!ftp_rename($ssh_conn, "$upload_dir/.$upload_file", "$upload_dir/$upload_file"))
+					die("aabs_upload: failed to rename uploaded build-file");
+
+				echo "\nFinished!";
 				break;
 		}
 
