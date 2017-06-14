@@ -1,10 +1,12 @@
 <?php
 
+    aabs_sync("NexusOS");
     aabs_sync("ResurrectionRemix");
-    aabs_sync("LineageOS");
+    aabs_sync("AOKP");
 
+    build_rom("NexusOS");
     build_rom("ResurrectionRemix");
-    build_rom("LineageOS");
+    build_rom("AOKP");
 
     function build_rom($rom) {
         // check if ROM is disabled
@@ -35,7 +37,7 @@
                 ),
             ),
             'zerofltecan' => array(
-                'alias' => array( 'zerofltetmo' ),
+                'alias' => array( 'zerofltetmo', 'zerofltespr' ),
                 'files' => array(
                     "boot.img",
                     "system/lib/hw/audio.primary.universal7420.so",
@@ -44,13 +46,13 @@
                 ),
             ),
             'zeroltecan' => array(
-                'alias' => array( 'zeroltetmo' ),
+                'alias' => array( 'zeroltetmo', 'zeroltespr' ),
                 'files' => array(
                     "boot.img",
                     "system/lib/hw/audio.primary.universal7420.so",
                     "system/lib64/hw/audio.primary.universal7420.so",
                     array( "device/samsung/zeroltecan/configs/audio/mixer_paths_0.xml", "system/etc/mixer_paths_0.xml" ),
-                ),
+                )
             ),
         ));
         aabs_upload($rom, "zero", "zerofltexx");

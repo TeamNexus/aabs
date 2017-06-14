@@ -162,7 +162,7 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
             if (!isset($script_targets[$target_device])) {
                 $script_targets[$target_device] = array(
                     'boot'   => false,
-                    'system' => false,
+                    'system' => false
                 );
             }
 
@@ -212,11 +212,13 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
                     $target_device_asserts .= str_replace("%%", $alias, $updater_device_assert);
                 }
 
-                $target_device_asserts = substr($target_device_asserts, 0, strlen($target_device_asserts) - 4);
-
+                $target_device_asserts        = substr($target_device_asserts, 0, strlen($target_device_asserts) - 4);
                 $updater_script_boot_asserts .= $target_device_asserts . ' || ';
-                $updater_script_boot         .= "ifelse({$target_device_asserts}, ui_print(\"[AABS] Injecting kernel for {$target}\"));\n";
-                $updater_script_boot         .= "ifelse({$target_device_asserts}, package_extract_file(\"patches/{$target}/boot.img\", \"{$boot_device_match[1]}\"));\n";
+
+                $updater_script_boot .= "if {$target_device_asserts} then\n";
+                $updater_script_boot .=     "ui_print(\"[AABS] Injecting kernel for {$target}\");\n";
+                $updater_script_boot .=     "package_extract_file(\"patches/{$target}/boot.img\", \"{$boot_device_match[1]}\");\n";
+                $updater_script_boot .= "endif;\n";
             }
 
             if ($flags['system']) {
@@ -224,11 +226,14 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
                 foreach ($targets[$target]['alias'] as $alias) {
                     $target_device_asserts .= str_replace("%%", $alias, $updater_device_assert);
                 }
-                $target_device_asserts = substr($target_device_asserts, 0, strlen($target_device_asserts) - 4);
 
+                $target_device_asserts          = substr($target_device_asserts, 0, strlen($target_device_asserts) - 4);
                 $updater_script_system_asserts .= $target_device_asserts . ' || ';
-                $updater_script_system         .= "ifelse({$target_device_asserts}, ui_print(\"[AABS] Injecting /system for {$target}\"));\n";
-                $updater_script_system         .= "ifelse({$target_device_asserts}, package_extract_dir(\"patches/{$target}/system\", \"/system\"));\n";
+
+                $updater_script_system .= "if {$target_device_asserts} then\n";
+                $updater_script_system .=     "ui_print(\"[AABS] Injecting /system for {$target}\");\n";
+                $updater_script_system .=     "package_extract_dir(\"patches/{$target}/system\", \"/system\");\n";
+                $updater_script_system .= "endif;\n";
             }
 
             $updater_script_asserts .= $target_device_asserts . ' || ';
@@ -238,8 +243,10 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
             $boot_flash_command = substr($boot_device_match[0], 0, strlen($boot_device_match[0]) - 1);
             $updater_script_boot_asserts = substr($updater_script_boot_asserts, 0, strlen($updater_script_boot_asserts) - 4);
 
-            $updater_script_boot .= "ifelse(!({$updater_script_boot_asserts}), ui_print(\"[AABS] Injecting default kernel\"));\n";
-            $updater_script_boot .= "ifelse(!({$updater_script_boot_asserts}), {$boot_flash_command});\n";
+            $updater_script_boot .= "if !({$updater_script_boot_asserts}) then\n";
+            $updater_script_boot .=     "ui_print(\"[AABS] Injecting default kernel\");\n";
+            $updater_script_boot .=     "{$boot_flash_command}\n";
+            $updater_script_boot .= "endif;\n";
 
             $updater_script = str_replace($boot_device_match[0], $updater_script_boot, $updater_script);
         }
@@ -251,7 +258,9 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
             $updater_script =
                 substr($updater_script, 0, $system_unmount_pos) .
                 $updater_script_system . "\n" .
-                "ifelse(!({$updater_script_system_asserts}), ui_print(\"[AABS] No need to inject /system\"));\n" .
+                "if !({$updater_script_system_asserts}) then\n" .
+                    "ui_print(\"[AABS] No need to inject /system\");\n" .
+                "endif;\n" .
                 substr($updater_script, $system_unmount_pos, strlen($updater_script) - $system_unmount_pos);
         }
 
@@ -265,6 +274,18 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
         $updater_script = substr($updater_script, $updater_script_assert_line);
 
         $updater_script =
+            "if !({$updater_script_asserts}) then\n" .
+                "ui_print(\"\");\n" .
+                "ui_print(\"\");\n" .
+                "ui_print(\" *****************************************\");\n" .
+                "ui_print(\" **                                     **\");\n" .
+                "ui_print(\" **    SORRY, BUT THIS BUILD DOESN'T    **\");\n" .
+                "ui_print(\" **         SUPPORT YOUR DEVICE         **\");\n" .
+                "ui_print(\" **                                     **\");\n" .
+                "ui_print(\" *****************************************\");\n" .
+                "ui_print(\"\");\n" .
+                "ui_print(\"\");\n" .
+            "endif;\n" .
             "assert({$updater_script_asserts});\n" .
             "ui_print(\" \");\n" .
             "ui_print(\" \");\n" .
@@ -281,9 +302,9 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
             "ui_print(\" \");\n" .
             "ui_print(\" \");\n" .
             "ui_print(\" *********************************\");\n" .
-            "ui_print(\"  ROM-Name:    {$rom}\");\n" .
-            "ui_print(\"  Base-Device: {$device}\");\n" .
-            "ui_print(\"  Timestamp:   " . date("Y-m-d H:i:s", AABS_START_TIME) . "\");\n" .
+            "ui_print(\" ROM-Name:      {$rom}\");\n" .
+            "ui_print(\" Base-Device:   {$device}\");\n" .
+            "ui_print(\" Timestamp:     " . date("Y-m-d H:i:s", AABS_START_TIME) . "\");\n" .
             "ui_print(\" *********************************\");\n" .
             "ui_print(\" \");\n" .
             $updater_script;
