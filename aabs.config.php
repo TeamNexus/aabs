@@ -57,13 +57,6 @@
         define('AABS_BUILD_JOBS', 16);
 
     /*
-     * Expression to match the build-output
-     * @default "lineage_*.zip"
-     */
-    if (!defined('AABS_BUILD_OUTPUT_MATCH'))
-        define('AABS_BUILD_OUTPUT_MATCH', "lineage_*.zip");
-
-    /*
      * Indicates if uploads should be enabled
      * @default true
      */
