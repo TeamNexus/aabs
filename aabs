@@ -497,13 +497,14 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
     
     function __validate_rom($rom) {
         switch ($rom) {
+            case "NexusOS":
             case "LineageOS":
             case "ResurrectionRemix":
             case "AOKP":
                 return;
         }
 
-        throw new Exception("Unspupported ROM: {$rom} (Supported: LineageOS, ResurrectionRemix, AOKP)");
+        throw new Exception("Unsupported ROM: {$rom} (Supported: LineageOS, NexusOS, ResurrectionRemix, AOKP)");
     }
     
     function __get_output_match($rom, $device) {
@@ -511,6 +512,7 @@ make <?php echo $targets;?> -j<?php echo $jobs; ?>
         
         switch ($rom) {
             case "LineageOS":
+            case "NexusOS":
             case "ResurrectionRemix":
                 return "lineage_${device}-ota-*.zip";
             case "AOKP":
