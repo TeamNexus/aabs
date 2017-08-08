@@ -3,13 +3,34 @@ AABS
 Automated Android Build Script
 ----------
 
+Dependencies
+==========
+Minimal requirements: (Sync and build)
+
+  * System: bash, cd, cp, mkdir, rm, unzip, zip
+  * System: make, repo
+  * PHP 5.6
+  * PHP: Enabled `system` and `shell_exec`
+
+Recommended requirements: (Sync, build and patch)
+
+  * **Minimal requirements: (Sync and build) +**
+  * PHP: pcre-extension
+
+Recommended requirements: (Sync, build, patch and upload)
+
+  * **Recommended requirements: (Sync, build and patch) +**
+  * System: megacmd (https://mega.nz/cmd)
+  * PHP: ftp-extension (with SSL-support)
+  * PHP: sftp-extension
+
 Getting started
 ==========
-Download the minimal aabs-autorun script from GitHub
+Download AABS from the latest sources, copy the configuration
+and set correct permissions for the main executable.
 
 	git clone https://github.com/TeamNexus/aabs ./aabs/
 	cp ./aabs/aabs.config.php ./aabs.config.php
-	cp ./aabs/aabs.build.php ./aabs.build.php
 	chmod +x ./aabs/aabs
 
 If you want to, you can edit the configs and build-operations
@@ -20,10 +41,12 @@ be built.
 Command Line-Options
 ==========
 
-	-d|--devices		List of devices which should be built, seperated by a single space. Default: * to build all devices
-	-r|--roms			List of ROMs which should be built, seperated by a single space. Default: * to build all ROMs
-	-S|--skip-sync		Flag, which tells the build-system to skip "repo sync". Default: false
-	-U|--skip-upload	Flag, which tells the build-system to skip the build-uploads. Default: false
+	-s, --skip-sync        No synchronization of ROM-sources
+	-b, --skip-build       Skips building the ROM
+	-u, --skip-patch       Don't run let AABS-patcher run over the build
+	-u, --skip-upload      Don't upload the ROM
+	-d, --devices          Devices which should be built by AABS (Comma-separated, Have to be defined in aabs.build.php)
+	-r, --roms             ROMS which should be built by AABS (Comma-separated, Have to be defined in aabs.build.php)
 
 License
 ==========
