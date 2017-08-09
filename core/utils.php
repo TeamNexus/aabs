@@ -5,12 +5,14 @@ function __mkdir($name) {
 		__exec("mkdir -p {$name}");
 }
 
-function __exec__no_assert($cmdline, $censoring = array( )) {
+function __exec__internal($blocking, $cmdline, $censoring = array( )) {
 	$output   = array( );
 	$rc       = 0;
 	$dcmdline = $cmdline;
+	$tempfile = "";
+	$is_external = (strpos($cmdline, "\n") !== false);
 		
-	if (strpos($cmdline, "\n") !== false) {
+	if ($is_external) {
 		$tempfile = tempnam(sys_get_temp_dir(), "aabs-exec-");
 		file_put_contents($tempfile, $cmdline);
 		chmod($tempfile, 0777);
@@ -22,20 +24,71 @@ function __exec__no_assert($cmdline, $censoring = array( )) {
 	}
 
 	echo "{$dcmdline}\n";
-	system("{$cmdline}", $rc);
-	
+
+	if ($blocking) {
+		passthru($cmdline, $rc);
+	} else {
+		$descriptorspec = array(
+			0 => array( "pipe", "r" ),   // stdin is a pipe that the child will read from
+			1 => array( "pipe", "w" ),   // stdout is a pipe that the child will write to
+			2 => array( "pipe", "w" )    // stderr is a pipe that the child will write to
+		);
+		$process = proc_open("{$cmdline}", $descriptorspec, $pipes, realpath('./'), array());
+
+		if (is_resource($process)) {
+			// all pipes to non-blocking
+			stream_set_blocking($pipes[0], 0);
+			stream_set_blocking($pipes[1], 0);
+			stream_set_blocking($pipes[2], 0);
+
+			while ($line = fgets($pipes[1])) {
+				print($line);
+				flush();
+			}
+			$rc = proc_close($process);
+		} else {
+			$rc = 1;
+		}
+	}
+
+	if ($is_external && $tempfile != "") {
+		unlink($tempfile);
+	}
+
 	return $rc;
 }
 
+function __exec__internal__blocking($cmdline, $censoring = array( )) {
+	return __exec__internal(true, $cmdline, $censoring);
+}
+
+function __exec__internal__non_blocking($cmdline, $censoring = array( )) {
+	return __exec__internal(false, $cmdline, $censoring);
+}
+
 function __exec($cmdline, $censoring = array( )) {
-	$rc = __exec__no_assert($cmdline, $censoring);
+	$rc = __exec__internal__blocking($cmdline, $censoring);
+	if ($rc != 0) {
+		die("Previous command failed with {$rc}\n");
+	}
+}
+
+function __exec__non_blocking($cmdline, $censoring = array( )) {
+	$rc = __exec__internal__non_blocking($cmdline, $censoring);
 	if ($rc != 0) {
 		die("Previous command failed with {$rc}\n");
 	}
 }
 
 function __exec__allow_single_error($cmdline, $code, $censoring = array( )) {
-	$rc = __exec__no_assert($cmdline, $censoring);
+	$rc = __exec__internal__blocking($cmdline, $censoring);
+	if ($rc != 0 && $rc != $code) {
+		die("Previous command failed with {$rc}\n");
+	}
+}
+
+function __exec__allow_single_error__non_blocking($cmdline, $code, $censoring = array( )) {
+	$rc = __exec__internal__non_blocking($cmdline, $censoring);
 	if ($rc != 0 && $rc != $code) {
 		die("Previous command failed with {$rc}\n");
 	}
