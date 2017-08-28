@@ -27,30 +27,11 @@ function aabs_upload($rom, $short_device, $device) {
 		if (!is_file($output_path)) {
 			die("Output not found: \"{$output_path}\"\n");
 		}
-		
-		$upload_dir	 = AABS_UPLOAD_DIR;
-		$upload_dir_len = strlen($upload_dir);
-		for ($i = 0; $i < $upload_dir_len; $i++) {
-			if ($upload_dir[$i] == '%' && $i + 1 < $upload_dir_len) {
-				$upload_dir = str_replace($upload_dir[$i] . $upload_dir[$i + 1], date($upload_dir[$i + 1], AABS_START_TIME), $upload_dir);
-				$upload_dir_len = strlen($upload_dir);
-			}
-		}
-		$upload_dir = str_replace("{ROM}", $rom, $upload_dir);
-		$upload_dir = str_replace("{DEVICE}", $device, $upload_dir);
-		$upload_dir = str_replace("{SHORT_DEVICE}", $short_device, $upload_dir);
 
-		$upload_file	 = AABS_UPLOAD_FILE;
-		$upload_file_len = strlen($upload_file);
-		for ($i = 0; $i < $upload_file_len; $i++) {
-			if ($upload_file[$i] == '%' && $i + 1 < $upload_file_len) {
-				$upload_file     = str_replace($upload_file[$i] . $upload_file[$i + 1], date($upload_file[$i + 1], AABS_START_TIME), $upload_file);
-				$upload_file_len = strlen($upload_file);
-			}
-		}
-		$upload_file = str_replace("{ROM}", $rom, $upload_file);
-		$upload_file = str_replace("{DEVICE}", $device, $upload_file);
-		$upload_file = str_replace("{SHORT_DEVICE}", $short_device, $upload_file);
+		$build_prop = file_get_contents("{$output_dir}/system/build.prop");
+		
+		$upload_dir = do_path_variables($rom, $device, $short_device, AABS_UPLOAD_DIR, $build_prop);
+		$upload_file = do_path_variables($rom, $device, $short_device, AABS_UPLOAD_FILE, $build_prop);
 
 		$fn = "";
 		$params = array( );

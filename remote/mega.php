@@ -9,28 +9,16 @@ function upload_to_mega($data) {
 	$uploaddir = $data['upload']['dir'];
 	$uploadfile = $data['upload']['file'];
 
-	// create temporary PID file
-	/* $megapid = tempnam(sys_get_temp_dir(), "aabs-megacmd-pid-");
-	file_put_contents($megapid, ""); */
-
-	// check for megacmd
-	__exec("command -v mega-cmd >/dev/null 2>&1 || exit 1");
-
-	// start megacmd
-	/* __exec__non_blocking(
-		"#!/bin/bash" . "\n" .
-		"mega-cmd &" . "\n" .
-		"echo $! > \"{$megapid}\""
-	); */
-
 	// login
 	$user = str_replace("\"", "\\\"", $user);
 	$pass = str_replace("\"", "\\\"", $pass);
-	__exec__allow_single_error("mega-login \"{$user}\" \"{$pass}\"", 202, array( $pass )); /* Allow "Already logged in."-error */
+
+	if (!__exec_ret("mega-login \"{$user}\" \"{$pass}\"", array( $pass ), array( 255 ))) {
+		__exec("screen -d -S \"aabs-mega-cmd\" -m \"mega-cmd\"");
+		sleep(5);
+		__exec_ret("mega-login \"{$user}\" \"{$pass}\"", array( $pass ), array( 202 ));
+	}
 
 	// upload file
 	__exec("mega-put {$output} -c {$uploaddir}/{$uploadfile}");
-
-	// start megacmd
-	/* __exec("kill " . file_get_contents($megapid)); */
 }

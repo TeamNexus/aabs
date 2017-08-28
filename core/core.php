@@ -1,8 +1,13 @@
 <?php
 
-$options = getopt("sbpud::r::", array( "skip-sync", "skip-build", "skip-patch", "skip-upload", "devices::", "roms::" ));
+$options = getopt("hsbpud::r::", array( "help", "skip-sync", "skip-build", "skip-patch", "skip-upload", "devices::", "roms::" ));
 foreach ($options as $key => $value) {
 	switch ($key) {
+		case "h":
+		case "help":
+			goto help;
+			break;
+
 		case "s":
 		case "skip-sync":
 			if (defined("AABS_SKIP_SYNC"))

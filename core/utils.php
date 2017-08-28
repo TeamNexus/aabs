@@ -5,7 +5,7 @@ function __mkdir($name) {
 		__exec("mkdir -p {$name}");
 }
 
-function __exec__internal($blocking, $cmdline, $censoring = array( )) {
+function __exec__internal($cmdline, $censoring = array( )) {
 	$output   = array( );
 	$rc       = 0;
 	$dcmdline = $cmdline;
@@ -24,32 +24,7 @@ function __exec__internal($blocking, $cmdline, $censoring = array( )) {
 	}
 
 	echo "{$dcmdline}\n";
-
-	if ($blocking) {
-		passthru($cmdline, $rc);
-	} else {
-		$descriptorspec = array(
-			0 => array( "pipe", "r" ),   // stdin is a pipe that the child will read from
-			1 => array( "pipe", "w" ),   // stdout is a pipe that the child will write to
-			2 => array( "pipe", "w" )    // stderr is a pipe that the child will write to
-		);
-		$process = proc_open("{$cmdline}", $descriptorspec, $pipes, realpath('./'), array());
-
-		if (is_resource($process)) {
-			// all pipes to non-blocking
-			stream_set_blocking($pipes[0], 0);
-			stream_set_blocking($pipes[1], 0);
-			stream_set_blocking($pipes[2], 0);
-
-			while ($line = fgets($pipes[1])) {
-				print($line);
-				flush();
-			}
-			$rc = proc_close($process);
-		} else {
-			$rc = 1;
-		}
-	}
+	passthru($cmdline, $rc);
 
 	if ($is_external && $tempfile != "") {
 		unlink($tempfile);
@@ -58,40 +33,26 @@ function __exec__internal($blocking, $cmdline, $censoring = array( )) {
 	return $rc;
 }
 
-function __exec__internal__blocking($cmdline, $censoring = array( )) {
-	return __exec__internal(true, $cmdline, $censoring);
-}
-
-function __exec__internal__non_blocking($cmdline, $censoring = array( )) {
-	return __exec__internal(false, $cmdline, $censoring);
-}
-
 function __exec($cmdline, $censoring = array( )) {
-	$rc = __exec__internal__blocking($cmdline, $censoring);
+	$rc = __exec__internal($cmdline, $censoring);
 	if ($rc != 0) {
 		die("Previous command failed with {$rc}\n");
 	}
 }
 
-function __exec__non_blocking($cmdline, $censoring = array( )) {
-	$rc = __exec__internal__non_blocking($cmdline, $censoring);
+function __exec_ret($cmdline, $censoring = array( ), $no_die_codes = array( )) {
+	$rc = __exec__internal($cmdline, $censoring);
+
+	if (in_array($rc, $no_die_codes)) {
+		return false;
+	}
+
 	if ($rc != 0) {
 		die("Previous command failed with {$rc}\n");
+		return false;
 	}
-}
-
-function __exec__allow_single_error($cmdline, $code, $censoring = array( )) {
-	$rc = __exec__internal__blocking($cmdline, $censoring);
-	if ($rc != 0 && $rc != $code) {
-		die("Previous command failed with {$rc}\n");
-	}
-}
-
-function __exec__allow_single_error__non_blocking($cmdline, $code, $censoring = array( )) {
-	$rc = __exec__internal__non_blocking($cmdline, $censoring);
-	if ($rc != 0 && $rc != $code) {
-		die("Previous command failed with {$rc}\n");
-	}
+	
+	return true;
 }
 	
 function __validate_rom($rom) {
@@ -117,4 +78,40 @@ function __get_output_match($rom, $device) {
 		case "AOKP":
 			return "aokp_${device}-ota-*.zip";
 	}
+}
+
+function do_path_variables($rom, $device, $short_device, $input, $build_prop) {
+	$properties = array( );
+
+	if (preg_match_all("/([a-zA-Z0-9\.\-\_]*)\=(.*)/", $build_prop, $prop_matches)) {
+		$match_count = count($prop_matches[0]);
+		for ($i = 0; $i < $match_count; $i++) {
+			$key   = $prop_matches[1][$i];
+			$value = $prop_matches[2][$i];
+			
+			$properties[$key] = $value;
+		}
+	}
+
+	$input_len = strlen($input);
+
+	// replace date and time
+	for ($i = 0; $i < $input_len; $i++) {
+		if ($input[$i] == '%' && $i + 1 < $input_len) {
+			$input     = str_replace($input[$i] . $input[$i + 1], date($input[$i + 1], AABS_START_TIME), $input);
+			$input_len = strlen($input);
+		}
+	}
+	
+	// replace build-properties
+	foreach ($properties as $key => $value) {
+		$input = str_replace("{PROP:{$key}}", $value, $input);
+	}
+
+	// replace static variables
+	$input = str_replace("{ROM}", $rom, $input);
+	$input = str_replace("{DEVICE}", $device, $input);
+	$input = str_replace("{SHORT_DEVICE}", $short_device, $input);
+
+	return $input;
 }
