@@ -126,4 +126,4 @@ if (!defined('AABS_UPLOAD_DIR'))
  * @default "{ROM}-multitarget-%Y-%m-%d_%H%i.zip"
  */
 if (!defined('AABS_UPLOAD_FILE'))
-	define('AABS_UPLOAD_FILE', "{ROM}-{SHORT_DEVICE}-multitarget-%Y-%m-%d_%H%i.zip");
+	define('AABS_UPLOAD_FILE', "{ROM}-{PROP:ro.build.version.release}-{SHORT_DEVICE}-multitarget-%Y-%m-%d_%H%i.zip");
