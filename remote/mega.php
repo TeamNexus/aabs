@@ -13,7 +13,8 @@ function upload_to_mega($data) {
 	$user = str_replace("\"", "\\\"", $user);
 	$pass = str_replace("\"", "\\\"", $pass);
 
-	if (!__exec_ret("mega-login \"{$user}\" \"{$pass}\"", array( $pass ), array( 255 ))) {
+	$login = __exec_ret("mega-login \"{$user}\" \"{$pass}\"", array( $pass ), array( 202, 255 ));
+	if ($login !== 0 && !== 202) {
 		__exec("screen -d -S \"aabs-mega-cmd\" -m \"mega-cmd\"");
 		sleep(5);
 		__exec_ret("mega-login \"{$user}\" \"{$pass}\"", array( $pass ), array( 202 ));

@@ -44,7 +44,7 @@ function __exec_ret($cmdline, $censoring = array( ), $no_die_codes = array( )) {
 	$rc = __exec__internal($cmdline, $censoring);
 
 	if (in_array($rc, $no_die_codes)) {
-		return false;
+		return $rc;
 	}
 
 	if ($rc != 0) {
