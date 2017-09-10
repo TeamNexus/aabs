@@ -18,13 +18,18 @@
 
 		aabs_build($rom, $device_prefix, "zerofltexx", array(
             'zerofltexx' => array(
+                'clean'   => array( "lineage_zerofltexx-ota-*.zip", "lineage-*-zerofltexx.zip" ),
                 'clobber' => AABS_SOURCE_CLOBBER,
+                'match'   => "lineage_zerofltexx-ota-*.zip",
+                'targets' => "bacon",
             ),
             'zeroltexx' => array(
+                'clean'   => array( "boot.img" ),
                 'clobber' => AABS_SOURCE_CLOBBER,
+                'match'   => "boot.img",
                 'targets' => "bootimage",
             ),
-		);
-        aabs_upload($rom, "zero", "zerofltexx", "lineage_${device}-ota-*.zip", BUILD_TYPE_BUILD);
+        ));
+        aabs_upload($rom, "zero", "zerofltexx", "lineage_zerofltexx-ota-*.zip", BUILD_TYPE_BUILD);
         aabs_upload($rom, "zero", "zeroltexx", "boot.img", BUILD_TYPE_BOOT);
     }

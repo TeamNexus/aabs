@@ -47,7 +47,7 @@ if (!defined('AABS_SOURCE_BASEDIR'))
  * @default true
  */
 if (!defined('AABS_SOURCE_CLOBBER'))
-	define('AABS_SOURCE_CLOBBER', true);
+	define('AABS_SOURCE_CLOBBER', false);
 
 /*
  * Count of concurrent jobs used to build the ROM and the patches

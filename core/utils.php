@@ -24,7 +24,7 @@ function __exec__internal($cmdline, $censoring = array( )) {
 	}
 
 	echo "{$dcmdline}\n";
-	passthru($cmdline, $rc);
+	passthru($cmdline);
 
 	if ($is_external && $tempfile != "") {
 		unlink($tempfile);
@@ -112,12 +112,16 @@ function do_path_variables($rom, $device, $short_device, $type, $input, $build_p
 	$input = str_replace("{ROM}", $rom, $input);
 	$input = str_replace("{DEVICE}", $device, $input);
 	$input = str_replace("{SHORT_DEVICE}", $short_device, $input);
-	$input = str_replace("{TYPE_FILEEXT}", $type, $input);
+	$input = str_replace("{TYPE_FILEEXT}", $type_fileext, $input);
 
 	if ($type_name != "") {
 		$input = str_replace("{-TYPE}", "-{$type_name}", $input);
 		$input = str_replace("{-TYPE-}", "-{$type_name}-", $input);
 		$input = str_replace("{TYPE-}", "{$type_name}-", $input);
+	} else {
+		$input = str_replace("{-TYPE}", "", $input);
+		$input = str_replace("{-TYPE-}", "", $input);
+		$input = str_replace("{TYPE-}", "", $input);
 	}
 
 	return $input;

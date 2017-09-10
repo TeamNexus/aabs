@@ -29,13 +29,14 @@ function aabs_upload($rom, $short_device, $device, $file_match, $type) {
 			die("Output not found: \"{$output_path}\"\n");
 		}
 
-		echo "Generating md5sum...\n";
-		__exec("md5sum \"{$output_path}\" > \"{$md5sum_path}\"");
-
 		$build_prop = file_get_contents("{$output_dir}/system/build.prop");
 
 		$upload_dir = do_path_variables($rom, $device, $short_device, $type, AABS_UPLOAD_DIR, $build_prop);
 		$upload_file = do_path_variables($rom, $device, $short_device, $type, AABS_UPLOAD_FILE, $build_prop);
+
+		echo "Generating md5sum...\n";
+		$md5sum = hash_file('md5', $output_path);
+		file_put_contents($md5sum_path, "{$md5sum}  {$upload_file}");
 
 		$fn = "";
 		$params = array( );

@@ -14,7 +14,7 @@ function upload_to_mega($data) {
 
 	echo "Trying to login to mega.nz...\n";
 	$login = __exec_ret("mega-login \"{$user}\" \"{$pass}\"", array( $pass ), array( 202, 255 ));
-	if ($login !== 0 && !== 202) {
+	if ($login !== 0 && $login !== 202) {
 		__exec("screen -d -S \"aabs-mega-cmd\" -m \"mega-cmd\"");
 		sleep(5);
 		__exec_ret("mega-login \"{$user}\" \"{$pass}\"", array( $pass ), array( 202 ));
