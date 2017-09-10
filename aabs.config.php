@@ -73,7 +73,7 @@ if (!defined('AABS_UPLOAD_TYPE'))
 /*
  * Hostname or IP of the upload-server
  *
- * Not required for: mega
+ * Not required for: local, mega
  *
  * @default "server.exmaple.com"
  */
@@ -83,7 +83,7 @@ if (!defined('AABS_UPLOAD_HOST'))
 /*
  * Port of the upload-server.
  *
- * Not required for: mega
+ * Not required for: local, mega
  *
  * @default 22
  */
@@ -93,9 +93,11 @@ if (!defined('AABS_UPLOAD_PORT'))
 /*
  * Username used to login to the upload-server
  *
- * ftp:  Username of the FTP-account
+ * Not required for: local
+ *
+ * ftp:  Username of the account
  * sftp: -||-
- * mega: Mail-Address of the account
+ * mega: -||-
  *
  * @default "root"
  */
@@ -105,7 +107,9 @@ if (!defined('AABS_UPLOAD_USER'))
 /*
  * Password used to login to the upload-server
  *
- * ftp:  Password of the FTP-account
+ * Not required for: local
+ *
+ * ftp:  Password of the account
  * sftp: -||-
  * mega: -||-
  *
