@@ -123,7 +123,7 @@ if (!defined('AABS_UPLOAD_PASS'))
  * @default "/var/www/https/build/%Y-%m-%d_%H%i/{SHORT_DEVICE}"
  */
 if (!defined('AABS_UPLOAD_DIR'))
-	define('AABS_UPLOAD_DIR', "/var/www/https/build/%Y-%m-%d_%H%i/{SHORT_DEVICE}");
+	define('AABS_UPLOAD_DIR', "/var/www/https/build/{SHORT_DEVICE}/%Y-%m-%d_%H%i");
 
 /*
  * New name of the uploaded build
@@ -131,3 +131,10 @@ if (!defined('AABS_UPLOAD_DIR'))
  */
 if (!defined('AABS_UPLOAD_FILE'))
 	define('AABS_UPLOAD_FILE', "{TYPE-}{ROM}-{PROP:ro.build.version.release}-{DEVICE}-%Y-%m-%d_%H%i.{TYPE_FILEEXT}");
+
+/*
+ * Comma-separated list of hashes to be generated
+ * @default "md5, sha1, sha256"
+ */
+if (!defined('AABS_HASH_METHODS'))
+	define('AABS_HASH_METHODS', "md5, sha1, sha256");

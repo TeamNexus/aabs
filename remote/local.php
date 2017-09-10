@@ -2,7 +2,7 @@
 
 function upload_to_local($data) {
 	$output = $data['output'];
-	$md5sum = $data['md5sum'];
+	$hashes = $data['hashes'];
 	$uploaddir = $data['upload']['dir'];
 	$uploadfile = $data['upload']['file'];
 	$uploadpath = "{$uploaddir}/{$uploadfile}";
@@ -13,6 +13,8 @@ function upload_to_local($data) {
 	echo "Uploading build...\n";
 	__exec("cp -p \"{$output}\" \"{$uploadpath}\"");
 
-	echo "Uploading md5sum...\n";
-	__exec("cp -p \"{$md5sum}\" \"{$uploadpath}.md5sum\"");
+	foreach ($hashes as $hash => $file) {
+		echo "Uploading {$hash}sum...\n";
+		__exec("cp -p \"{$file}\" \"{$uploadpath}.{$hash}sum\"");
+	}
 }

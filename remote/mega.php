@@ -5,7 +5,7 @@ function upload_to_mega($data) {
 	$pass = $data['remote']['pass'];
 
 	$output = $data['output'];
-	$md5sum = $data['md5sum'];
+	$hashes = $data['hashes'];
 	$uploaddir = $data['upload']['dir'];
 	$uploadfile = $data['upload']['file'];
 
@@ -23,6 +23,8 @@ function upload_to_mega($data) {
 	echo "Uploading build...\n";
 	__exec("mega-put \"{$output}\" -c \"{$uploaddir}/{$uploadfile}\"");
 
-	echo "Uploading md5sum...\n";
-	__exec("mega-put \"{$md5sum}\" -c \"{$uploaddir}/{$uploadfile}.md5sum\"");
+	foreach ($hashes as $hash => $file) {
+		echo "Uploading {$hash}sum...\n";
+		__exec("mega-put \"{$file}\" -c \"{$uploaddir}/{$uploadfile}.{$hash}sum\"");
+	}
 }

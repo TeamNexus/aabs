@@ -23,7 +23,6 @@ function aabs_upload($rom, $short_device, $device, $file_match, $type) {
 		$output_dir	    = "{$source_dir}/out/target/product/{$device}";
 		$output_name    = trim(shell_exec("/bin/bash -c \"basename {$output_dir}/{$file_match}\""), "\n\t");
 		$output_path    = "{$output_dir}/{$output_name}";
-		$md5sum_path    = "{$output_dir}/{$output_name}.aabs.md5sum";
 
 		if (!is_file($output_path)) {
 			die("Output not found: \"{$output_path}\"\n");
@@ -34,9 +33,19 @@ function aabs_upload($rom, $short_device, $device, $file_match, $type) {
 		$upload_dir = do_path_variables($rom, $device, $short_device, $type, AABS_UPLOAD_DIR, $build_prop);
 		$upload_file = do_path_variables($rom, $device, $short_device, $type, AABS_UPLOAD_FILE, $build_prop);
 
-		echo "Generating md5sum...\n";
-		$md5sum = hash_file('md5', $output_path);
-		file_put_contents($md5sum_path, "{$md5sum}  {$upload_file}");
+		$hash_methods = explode(",", AABS_HASH_METHODS);
+		$hash_files = array( );
+
+		foreach ($hash_methods as $hash_method) {
+			$hash_method = trim($hash_method, " ");
+			$hash_path   = "{$output_dir}/{$output_name}.aabs.{$hash_method}sum";
+
+			echo "Generating {$hash_method}sum...\n";
+			$out_hash = hash_file($hash_method, $output_path);
+			file_put_contents($hash_path, "{$out_hash}  {$upload_file}");
+
+			$hash_files[$hash_method] = $hash_path;
+		}
 
 		$fn = "";
 		$params = array( );
@@ -82,7 +91,7 @@ function aabs_upload($rom, $short_device, $device, $file_match, $type) {
 		}
 
 		$params['output'] = $output_path;
-		$params['md5sum'] = $md5sum_path;
+		$params['hashes'] = $hash_files;
 		$params['upload'] = array(
 			'dir'  => $upload_dir,
 			'file' => $upload_file,

@@ -7,7 +7,7 @@ function upload_to_sftp($data) {
 	$pass = $data['remote']['pass'];
 
 	$output = $data['output'];
-	$md5sum = $data['md5sum'];
+	$hashes = $data['hashes'];
 	$uploaddir = $data['upload']['dir'];
 	$uploadfile = $data['upload']['file'];
 	
@@ -34,8 +34,10 @@ function upload_to_sftp($data) {
 	if (!ssh2_exec($ssh_conn, "mv \"$uploaddir/.$uploadfile\" \"$uploaddir/$uploadfile\""))
 		die("aabs_upload: failed to rename uploaded build-file");
 
-	echo "Uploading md5sum...\n";
-	upload($sftp_conn, $md5sum, $uploaddir, "{$uploadfile}.md5sum");
+	foreach ($hashes as $hash => $file) {
+		echo "Uploading {$hash}sum...\n";
+		upload($sftp_conn, $file, $uploaddir, "{$uploadfile}.{$hash}sum");
+	}
 }
 
 function upload($sftp_conn, $local_file, $upload_dir, $upload_file) {

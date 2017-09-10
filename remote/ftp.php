@@ -7,7 +7,7 @@ function upload_to_ftp($data) {
 	$pass = $data['remote']['pass'];
 
 	$output = $data['output'];
-	$md5sum = $data['md5sum'];
+	$hashes = $data['hashes'];
 	$uploaddir = $data['upload']['dir'];
 	$uploadfile = $data['upload']['file'];
 
@@ -35,9 +35,11 @@ function upload_to_ftp($data) {
 	if (!ftp_rename($ftp_conn, "$uploaddir/.$uploadfile", "$uploaddir/$uploadfile"))
 		die("aabs_upload: failed to rename uploaded build-file");
 
-	echo "Uploading md5sum...\n";
-	if (!ftp_put($ftp_conn, "${uploaddir}/${uploadfile}.md5sum", $output, FTP_BINARY))
-		die("aabs_upload: failed to upload md5sum to \"${uploaddir}/${uploadfile}.md5sum\"");
+	foreach ($hashes as $hash => $file) {
+		echo "Uploading {$hash}sum...\n";
+		if (!ftp_put($file, "${uploaddir}/${uploadfile}.{$hash}sum", $output, FTP_BINARY))
+			die("aabs_upload: failed to upload {$hash}sum to \"${uploaddir}/${uploadfile}.{$hash}sum\"");
+	}
 }
 
 // http://php.net/manual/en/function.ftp-mkdir.php#112399
