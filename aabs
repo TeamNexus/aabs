@@ -4,6 +4,9 @@
 define('AABS_BASEDIR', dirname($argv[0]));
 define('AABS_START_TIME', time());
 
+// include global constants
+include AABS_BASEDIR . "/core/const.php";
+
 // include utilities
 include AABS_BASEDIR . "/core/utils.php";
 

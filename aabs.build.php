@@ -1,9 +1,11 @@
 <?php
 
+    aabs_sync("LineageOS");
     aabs_sync("NexusOS");
     aabs_sync("ResurrectionRemix");
     aabs_sync("AOKP");
 
+    build_rom("LineageOS", "lineage");
     build_rom("NexusOS", "lineage");
     build_rom("ResurrectionRemix", "lineage");
     build_rom("AOKP", "aokp");
@@ -14,46 +16,15 @@
             return;
         }
 
-        // Samsung Galaxy S6 (zero, SM-G92xx)
-        aabs_build($rom, $device_prefix, "zerofltexx", array(
+		aabs_build($rom, $device_prefix, "zerofltexx", array(
             'zerofltexx' => array(
                 'clobber' => AABS_SOURCE_CLOBBER,
             ),
             'zeroltexx' => array(
+                'clobber' => AABS_SOURCE_CLOBBER,
                 'targets' => "bootimage",
             ),
-            'zerofltecan' => array(
-                'targets' => "bootimage audio.primary.universal7420_32 audio.primary.universal7420",
-            ),
-            'zeroltecan' => array(
-                'targets' => "bootimage audio.primary.universal7420_32 audio.primary.universal7420",
-            )
-        ));
-        aabs_patch($rom, array( "zerofltexx", "zeroflte" ), array(
-            'zeroltexx' => array(
-                'alias' => array( 'zerolte' ),
-                'files' => array(
-                    "boot.img",
-                ),
-            ),
-            'zerofltecan' => array(
-                'alias' => array( 'zerofltetmo', 'zerofltespr' ),
-                'files' => array(
-                    "boot.img",
-                    "system/lib/hw/audio.primary.universal7420.so",
-                    "system/lib64/hw/audio.primary.universal7420.so",
-                    array( "device/samsung/zerofltecan/configs/audio/mixer_paths_0.xml", "system/etc/mixer_paths_0.xml" ),
-                ),
-            ),
-            'zeroltecan' => array(
-                'alias' => array( 'zeroltetmo', 'zeroltespr' ),
-                'files' => array(
-                    "boot.img",
-                    "system/lib/hw/audio.primary.universal7420.so",
-                    "system/lib64/hw/audio.primary.universal7420.so",
-                    array( "device/samsung/zeroltecan/configs/audio/mixer_paths_0.xml", "system/etc/mixer_paths_0.xml" ),
-                )
-            ),
-        ));
-        aabs_upload($rom, "zero", "zerofltexx");
+		);
+        aabs_upload($rom, "zero", "zerofltexx", "lineage_${device}-ota-*.zip", BUILD_TYPE_BUILD);
+        aabs_upload($rom, "zero", "zeroltexx", "boot.img", BUILD_TYPE_BOOT);
     }

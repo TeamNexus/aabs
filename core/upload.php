@@ -1,6 +1,6 @@
 <?php
 
-function aabs_upload($rom, $short_device, $device) {
+function aabs_upload($rom, $short_device, $device, $file_match, $type) {
 		// check if uploading is disabled
 		if (AABS_SKIP_UPLOAD) {
 			return;
@@ -21,7 +21,7 @@ function aabs_upload($rom, $short_device, $device) {
 
 		$source_dir	    = AABS_SOURCE_BASEDIR . "/{$rom}";
 		$output_dir	    = "{$source_dir}/out/target/product/{$device}";
-		$output_name    = trim(shell_exec("/bin/bash -c \"basename $output_dir/" . __get_output_match($rom, $device) . "\""), "\n\t");
+		$output_name    = trim(shell_exec("/bin/bash -c \"basename {$output_dir}/{$file_match}\""), "\n\t");
 		$output_path    = "{$output_dir}/{$output_name}";
 		$md5sum_path    = "{$output_dir}/{$output_name}.aabs.md5sum";
 
@@ -33,9 +33,9 @@ function aabs_upload($rom, $short_device, $device) {
 		__exec("md5sum \"{$output_path}\" > \"{$md5sum_path}\"");
 
 		$build_prop = file_get_contents("{$output_dir}/system/build.prop");
-		
-		$upload_dir = do_path_variables($rom, $device, $short_device, AABS_UPLOAD_DIR, $build_prop);
-		$upload_file = do_path_variables($rom, $device, $short_device, AABS_UPLOAD_FILE, $build_prop);
+
+		$upload_dir = do_path_variables($rom, $device, $short_device, $type, AABS_UPLOAD_DIR, $build_prop);
+		$upload_file = do_path_variables($rom, $device, $short_device, $type, AABS_UPLOAD_FILE, $build_prop);
 
 		$fn = "";
 		$params = array( );

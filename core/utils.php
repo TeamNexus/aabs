@@ -66,21 +66,8 @@ function __validate_rom($rom) {
 
 	throw new Exception("Unsupported ROM: {$rom} (Supported: LineageOS, NexusOS, ResurrectionRemix, AOKP)");
 }
-	
-function __get_output_match($rom, $device) {
-	__validate_rom($rom);
 
-	switch ($rom) {
-		case "LineageOS":
-		case "NexusOS":
-		case "ResurrectionRemix":
-			return "lineage_${device}-ota-*.zip";
-		case "AOKP":
-			return "aokp_${device}-ota-*.zip";
-	}
-}
-
-function do_path_variables($rom, $device, $short_device, $input, $build_prop) {
+function do_path_variables($rom, $device, $short_device, $type, $input, $build_prop) {
 	$properties = array( );
 
 	if (preg_match_all("/([a-zA-Z0-9\.\-\_]*)\=(.*)/", $build_prop, $prop_matches)) {
@@ -108,10 +95,30 @@ function do_path_variables($rom, $device, $short_device, $input, $build_prop) {
 		$input = str_replace("{PROP:{$key}}", $value, $input);
 	}
 
+	// generate dynamic variables
+	$type_name = "";
+	$type_fileext = "";
+	switch ($type) {
+		case BUILD_TYPE_BUILD:
+			$type_fileext = "zip";
+			break;
+		case BUILD_TYPE_BOOT:
+			$type_name = "Kernel";
+			$type_fileext = "img";
+			break;
+	}
+
 	// replace static variables
 	$input = str_replace("{ROM}", $rom, $input);
 	$input = str_replace("{DEVICE}", $device, $input);
 	$input = str_replace("{SHORT_DEVICE}", $short_device, $input);
+	$input = str_replace("{TYPE_FILEEXT}", $type, $input);
+
+	if ($type_name != "") {
+		$input = str_replace("{-TYPE}", "-{$type_name}", $input);
+		$input = str_replace("{-TYPE-}", "-{$type_name}-", $input);
+		$input = str_replace("{TYPE-}", "{$type_name}-", $input);
+	}
 
 	return $input;
 }
