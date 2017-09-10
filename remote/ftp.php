@@ -5,7 +5,9 @@ function upload_to_ftp($data) {
 	$port = $data['remote']['port'];
 	$user = $data['remote']['user'];
 	$pass = $data['remote']['pass'];
-	$output = $data['output']['path'];
+
+	$output = $data['output'];
+	$md5sum = $data['md5sum'];
 	$uploaddir = $data['upload']['dir'];
 	$uploadfile = $data['upload']['file'];
 
@@ -25,13 +27,17 @@ function upload_to_ftp($data) {
 	if (!ftp_mksubdirs($ftp_conn, "/", $uploaddir))
 		die("aabs_upload: failed to create upload-directory \"${uploaddir}\"");
 
-	echo "Uploading...\n";
+	echo "Uploading build...\n";
 	if (!ftp_put($ftp_conn, "${uploaddir}/.${uploadfile}", $output, FTP_BINARY))
 		die("aabs_upload: failed to upload build to \"${uploaddir}/.${uploadfile}\"");
 
 	echo "Make build visible...\n";
 	if (!ftp_rename($ftp_conn, "$uploaddir/.$uploadfile", "$uploaddir/$uploadfile"))
 		die("aabs_upload: failed to rename uploaded build-file");
+
+	echo "Uploading md5sum...\n";
+	if (!ftp_put($ftp_conn, "${uploaddir}/${uploadfile}.md5sum", $output, FTP_BINARY))
+		die("aabs_upload: failed to upload md5sum to \"${uploaddir}/${uploadfile}.md5sum\"");
 }
 
 // http://php.net/manual/en/function.ftp-mkdir.php#112399

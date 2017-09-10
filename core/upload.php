@@ -23,10 +23,14 @@ function aabs_upload($rom, $short_device, $device) {
 		$output_dir	    = "{$source_dir}/out/target/product/{$device}";
 		$output_name    = trim(shell_exec("/bin/bash -c \"basename $output_dir/" . __get_output_match($rom, $device) . "\""), "\n\t");
 		$output_path    = "{$output_dir}/{$output_name}";
+		$md5sum_path    = "{$output_dir}/{$output_name}.aabs.md5sum";
 
 		if (!is_file($output_path)) {
 			die("Output not found: \"{$output_path}\"\n");
 		}
+
+		echo "Generating md5sum...\n";
+		__exec("md5sum \"{$output_path}\" > \"{$md5sum_path}\"");
 
 		$build_prop = file_get_contents("{$output_dir}/system/build.prop");
 		
@@ -69,18 +73,20 @@ function aabs_upload($rom, $short_device, $device) {
 					),
 				);
 				break;
+
+			case "local":
+				$fn = "upload_to_local";
+				$params = array( );
+				break;
 		}
-		
-		$params['output'] = array(
-			'path'  => $output_path,
-			'dir'  => $output_dir,
-			'file' => $output_name,
-		);
+
+		$params['output'] = $output_path;
+		$params['md5sum'] = $md5sum_path;
 		$params['upload'] = array(
 			'dir'  => $upload_dir,
 			'file' => $upload_file,
 		);
-		
+
 		$fn($params);
 
 		echo "\nFinished!\n";
