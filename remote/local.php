@@ -11,10 +11,13 @@ function upload_to_local($data) {
     __exec("mkdir -p \"{$uploaddir}\"");
 
     echo "Uploading build...\n";
-    __exec("cp -p \"{$output}\" \"{$uploadpath}\"");
+    __exec("pv \"{$output}\" > \"{$uploaddir}/.{$uploadfile}\"");
+
+    echo "Make build visible...\n";
+    __exec("mv \"{$uploaddir}/.{$uploadfile}\" \"{$uploadpath}\"");
 
     foreach ($hashes as $hash => $file) {
         echo "Uploading {$hash}sum...\n";
-        __exec("cp -p \"{$file}\" \"{$uploadpath}.{$hash}sum\"");
+        __exec("pv \"{$file}\" > \"{$uploadpath}.{$hash}sum\"");
     }
 }
