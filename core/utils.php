@@ -67,7 +67,7 @@ function __validate_rom($rom) {
     throw new Exception("Unsupported ROM: {$rom} (Supported: LineageOS, NexusOS, ResurrectionRemix, AOKP)");
 }
 
-function do_path_variables($rom, $device, $short_device, $type, $input, $build_prop) {
+function parse_build_props($build_prop) {
     $properties = array( );
 
     if (preg_match_all("/([a-zA-Z0-9\.\-\_]*)\=(.*)/", $build_prop, $prop_matches)) {
@@ -80,9 +80,12 @@ function do_path_variables($rom, $device, $short_device, $type, $input, $build_p
         }
     }
 
-    $input_len = strlen($input);
+    return $properties;
+}
 
+function do_path_variables($rom, $device, $short_device, $type, $input, $build_prop) {
     // replace date and time
+    $input_len = strlen($input);
     for ($i = 0; $i < $input_len; $i++) {
         if ($input[$i] == '%' && $i + 1 < $input_len) {
             $input     = str_replace($input[$i] . $input[$i + 1], date($input[$i + 1], AABS_START_TIME), $input);
@@ -91,6 +94,7 @@ function do_path_variables($rom, $device, $short_device, $type, $input, $build_p
     }
 
     // replace build-properties
+    $properties = parse_build_props($build_prop);
     foreach ($properties as $key => $value) {
         $input = str_replace("{PROP:{$key}}", $value, $input);
     }
@@ -105,6 +109,10 @@ function do_path_variables($rom, $device, $short_device, $type, $input, $build_p
         case BUILD_TYPE_BOOT:
             $type_name = "Kernel";
             $type_fileext = "img";
+            break;
+        case BUILD_TYPE_PATCH:
+            $type_name = "Patch";
+            $type_fileext = "zip";
             break;
     }
 
