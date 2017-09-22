@@ -26,7 +26,7 @@ function aabs_sync($rom) {
     $command .= "\n";
     $command .= 'cd "' . AABS_SOURCE_BASEDIR . "/{$rom}" . '"' . "\n" . $__assert;
     $command .= "\n";
-    $command .= 'repo sync -c -d --force-sync --no-clone-bundle --jobs=' . AABS_SYNC_JOBS . "\n" . $__assert;
+    $command .= 'repo sync -c -d -f --force-sync --no-clone-bundle --jobs=' . AABS_SYNC_JOBS . "\n" . $__assert;
     $command .= "\n";
 
     __exec($command);
