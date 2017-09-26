@@ -29,7 +29,25 @@ function build_rom($rom, $device_prefix) {
             'match'   => "boot.img",
             'targets' => "bootimage",
         ),
+        'zerofltespr' => array(
+            'clean'   => array( "boot.img" ),
+            'clobber' => AABS_SOURCE_CLOBBER,
+            'match'   => "boot.img",
+            'targets' => "bootimage",
+        ),
+        'zeroltespr' => array(
+            'clean'   => array( "boot.img" ),
+            'clobber' => AABS_SOURCE_CLOBBER,
+            'match'   => "boot.img",
+            'targets' => "bootimage",
+        ),
     ));
+
+    // build
     aabs_upload($rom, "zero", "zerofltexx", "lineage_zerofltexx-ota-*.zip", BUILD_TYPE_BUILD);
+
+    // kernels
     aabs_upload($rom, "zero", "zeroltexx", "boot.img", BUILD_TYPE_BOOT);
+    aabs_upload($rom, "zero", "zerofltespr", "boot.img", BUILD_TYPE_BOOT);
+    aabs_upload($rom, "zero", "zeroltespr", "boot.img", BUILD_TYPE_BOOT);
 }
