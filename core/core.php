@@ -45,7 +45,7 @@ foreach ($options as $key => $value) {
             if (defined("AABS_SKIP_SYNC"))
                 goto help;
 
-            define("AABS_DEVICES", $value . " ");
+            define("AABS_DEVICES", $value);
             break;
 
         case "r":
@@ -53,7 +53,7 @@ foreach ($options as $key => $value) {
             if (defined("AABS_ROMS"))
                 goto help;
 
-            define("AABS_ROMS", $value . " ");
+            define("AABS_ROMS", $value);
             break;
 
         default:
