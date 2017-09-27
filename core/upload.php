@@ -6,8 +6,10 @@ function aabs_upload($rom, $short_device, $device, $file_match, $type) {
             return;
         }
 
-        // check if ROM is supported
-        __validate_rom($rom);
+        // check if ROM is supported and existing
+        if (!__validate_rom($rom)) {
+            return;
+        }
 
         // check if ROM is disabled
         if (AABS_ROMS != "*" && strpos(AABS_ROMS . " ", "{$rom} ") === false) {

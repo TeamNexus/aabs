@@ -6,8 +6,10 @@ function aabs_patch($rom, $device, $targets = array( )) {
         return;
     }
 
-    // check if ROM is supported
-    __validate_rom($rom);
+    // check if ROM is supported and existing
+    if (!__validate_rom($rom)) {
+        return;
+    }
 
     if (is_array($device)) {
         $device_aliases = $device;

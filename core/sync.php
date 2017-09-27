@@ -11,8 +11,10 @@ function aabs_sync($rom) {
         return;
     }
 
-    // check if ROM is supported
-    __validate_rom($rom);
+    // check if ROM is supported and existing
+    if (!__validate_rom($rom)) {
+        return;
+    }
 
     $__assert  = "";
     $__assert .= 'ret=$?' . "\n";

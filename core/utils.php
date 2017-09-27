@@ -56,12 +56,14 @@ function __exec_ret($cmdline, $censoring = array( ), $no_die_codes = array( )) {
 }
 
 function __validate_rom($rom) {
+    $sourcedir = AABS_SOURCE_BASEDIR . "/{$rom}";
+
     switch ($rom) {
         case "NexusOS":
         case "LineageOS":
         case "ResurrectionRemix":
         case "AOKP":
-            return;
+            return is_dir($sourcedir);
     }
 
     throw new Exception("Unsupported ROM: {$rom} (Supported: LineageOS, NexusOS, ResurrectionRemix, AOKP)");
