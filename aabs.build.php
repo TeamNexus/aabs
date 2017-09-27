@@ -12,7 +12,7 @@ build_rom("AOKP", "aokp");
 
 function build_rom($rom, $device_prefix) {
     // check if ROM is disabled
-    if (AABS_ROMS != "*" && strpos(AABS_ROMS, "{$rom} ") === false) {
+    if (AABS_ROMS != "*" && strpos(AABS_ROMS . " ", "{$rom} ") === false) {
         return;
     }
 
