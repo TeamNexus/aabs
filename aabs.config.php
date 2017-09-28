@@ -5,70 +5,70 @@
  * @default false
  */
 /* if (!defined('AABS_SKIP_SYNC'))
-    define('AABS_SKIP_SYNC', false); */
+	define('AABS_SKIP_SYNC', false); */
 
 /*
  * OVERRIDE: Enforce to skip the upload of the builds
  * @default false
  */
 /* if (!defined('AABS_SKIP_UPLOAD'))
-    define('AABS_SKIP_UPLOAD', false); */
+	define('AABS_SKIP_UPLOAD', false); */
 
 /*
  * OVERRIDE: Enforced list of devices to build
  * @default "*"
  */
 /* if (!defined('AABS_DEVICES'))
-    define('AABS_DEVICES', "*"); */
+	define('AABS_DEVICES', "*"); */
 
 /*
  * OVERRIDE: Enforced list of ROMs to build
  * @default "*"
  */
 /* if (!defined('AABS_ROMS'))
-    define('AABS_ROMS', "*"); */
+	define('AABS_ROMS', "*"); */
 
 /*
  * Count of concurrent jobs used to sync the sources
  * @default 4
  */
 if (!defined('AABS_SYNC_JOBS'))
-    define('AABS_SYNC_JOBS', 4);
+	define('AABS_SYNC_JOBS', 4);
 
 /*
  * Directory which contains the repos of all ROMs
  * @default "/home"
  */
 if (!defined('AABS_SOURCE_BASEDIR'))
-    define('AABS_SOURCE_BASEDIR', "/home");
+	define('AABS_SOURCE_BASEDIR', "/home");
 
 /*
  * Indicates if the build-output should be clobbered
  * @default true
  */
 if (!defined('AABS_SOURCE_CLOBBER'))
-    define('AABS_SOURCE_CLOBBER', false);
+	define('AABS_SOURCE_CLOBBER', false);
 
 /*
  * Count of concurrent jobs used to build the ROM and the patches
  * @default 16
  */
 if (!defined('AABS_BUILD_JOBS'))
-    define('AABS_BUILD_JOBS', 16);
+	define('AABS_BUILD_JOBS', 16);
 
 /*
  * Indicates if uploads should be enabled
  * @default true
  */
 if (!defined('AABS_UPLOAD'))
-    define('AABS_UPLOAD', true);
+	define('AABS_UPLOAD', true);
 
 /*
  * Type of upload-method ("ftp", "sftp" or "mega")
  * @default ftp
  */
 if (!defined('AABS_UPLOAD_TYPE'))
-    define('AABS_UPLOAD_TYPE', "ftp");
+	define('AABS_UPLOAD_TYPE', "ftp");
 
 /*
  * Hostname or IP of the upload-server
@@ -78,7 +78,7 @@ if (!defined('AABS_UPLOAD_TYPE'))
  * @default "server.exmaple.com"
  */
 if (!defined('AABS_UPLOAD_HOST'))
-    define('AABS_UPLOAD_HOST', "server.exmaple.com");
+	define('AABS_UPLOAD_HOST', "server.exmaple.com");
 
 /*
  * Port of the upload-server.
@@ -88,7 +88,7 @@ if (!defined('AABS_UPLOAD_HOST'))
  * @default 22
  */
 if (!defined('AABS_UPLOAD_PORT'))
-    define('AABS_UPLOAD_PORT', 22);
+	define('AABS_UPLOAD_PORT', 22);
 
 /*
  * Username used to login to the upload-server
@@ -102,7 +102,7 @@ if (!defined('AABS_UPLOAD_PORT'))
  * @default "root"
  */
 if (!defined('AABS_UPLOAD_USER'))
-    define('AABS_UPLOAD_USER', "root");
+	define('AABS_UPLOAD_USER', "root");
 
 /*
  * Password used to login to the upload-server
@@ -116,25 +116,25 @@ if (!defined('AABS_UPLOAD_USER'))
  * @default "datpasswd"
  */
 if (!defined('AABS_UPLOAD_PASS'))
-    define('AABS_UPLOAD_PASS', "datpasswd");
+	define('AABS_UPLOAD_PASS', "datpasswd");
 
 /*
  * Directory to which the builds should be uploaded to
  * @default "/var/www/https/build/%Y-%m-%d_%H%i/{SHORT_DEVICE}"
  */
 if (!defined('AABS_UPLOAD_DIR'))
-    define('AABS_UPLOAD_DIR', "/var/www/https/build/{SHORT_DEVICE}/%Y-%m-%d_%H%i");
+	define('AABS_UPLOAD_DIR', "/var/www/https/build/{SHORT_DEVICE}/%Y-%m-%d_%H%i");
 
 /*
  * New name of the uploaded build
  * @default "{ROM}-multitarget-%Y-%m-%d_%H%i.zip"
  */
 if (!defined('AABS_UPLOAD_FILE'))
-    define('AABS_UPLOAD_FILE', "{TYPE-}{ROM}-{PROP:ro.build.version.release}-{DEVICE}-%Y-%m-%d_%H%i.{TYPE_FILEEXT}");
+	define('AABS_UPLOAD_FILE', "{TYPE-}{ROM}-{PROP:ro.build.version.release}-{DEVICE}-%Y-%m-%d_%H%i.{TYPE_FILEEXT}");
 
 /*
  * Comma-separated list of hashes to be generated
  * @default "md5, sha1, sha256"
  */
 if (!defined('AABS_HASH_METHODS'))
-    define('AABS_HASH_METHODS', "md5, sha1, sha256");
+	define('AABS_HASH_METHODS', "md5, sha1, sha256");
