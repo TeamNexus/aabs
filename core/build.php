@@ -1,6 +1,6 @@
 <?php
 
-function aabs_build($rom, $device_prefix, $main_device, $targets_combinations) {
+function aabs_build($rom, $device_prefix, $targets_combinations) {
     // check if build is disabled
     if (AABS_SKIP_BUILD) {
         return;
