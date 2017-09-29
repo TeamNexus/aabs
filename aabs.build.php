@@ -48,10 +48,10 @@ function build_rom($rom, $lunch_rom) {
 
 		// G92[0/5]P (and maybe more...)
 		'zerofltespr' => array(
-			'clean'   => array( "boot.img" ),
+			'clean'   => array( "lineage_zerofltespr-ota-*.zip", "lineage-*-zerofltespr.zip" ),
 			'clobber' => false,
-			'match'   => "boot.img",
-			'targets' => "bootimage",
+			'match'   => "lineage_zerofltespr-ota-*.zip",
+			'targets' => "bacon",
 		),
 		'zeroltespr' => array(
 			'clean'   => array( "boot.img" ),
