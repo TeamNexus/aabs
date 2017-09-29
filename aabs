@@ -20,7 +20,7 @@ AABS_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Update AABS
 if [ "${AABS_IS_DEV_MACHINE}" != "true" ]; then
-	git -C "$AABS_PATH" reset --hard `git -C \"${AABS_PATH}\" rev-list --max-parents=0 --abbrev-commit HEAD`
+	git -C "$AABS_PATH" reset --hard `git -C "${AABS_PATH}" rev-list --max-parents=0 --abbrev-commit HEAD`
 	git -C "$AABS_PATH" pull https://github.com/TeamNexus/aabs master
 fi
 
