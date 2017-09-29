@@ -28,8 +28,10 @@ function xexec_internal($cmdline, $censoring = array( )) {
 		chmod($tempfile, 0777);
 		$dcmdline = $cmdline = "/bin/bash -c {$tempfile}";
 	} else {
-		foreach($censoring as $censor) {
-			$dcmdline = str_replace($censor, "***", $dcmdline);
+		if (is_array($censoring)) {
+			foreach($censoring as $censor) {
+				$dcmdline = str_replace($censor, "***", $dcmdline);
+			}
 		}
 	}
 

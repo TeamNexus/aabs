@@ -1,5 +1,4 @@
 <?php
-
 /*
  * Copyright (C) 2017 Lukas Berger <mail@lukasberger.at>
  *
@@ -17,5 +16,5 @@
  */
 
 function command_exists($cmd) {
-    return !empty(shell_exec("which \"{$cmd}\" 2>/dev/null"));
+    return xexec_return("which \"$cmd\"", null, array( 1 )) === true;
 }
