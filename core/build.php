@@ -1,6 +1,6 @@
 <?php
 
-function aabs_build($rom, $device_prefix, $targets_combinations) {
+function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 	// check if build is disabled
 	if (AABS_SKIP_BUILD) {
 		return;
@@ -60,7 +60,7 @@ function aabs_build($rom, $device_prefix, $targets_combinations) {
 			$command .= "\n";
 		}
 
-		$command .= 'lunch ' . $device_prefix . '_' . $device . '-userdebug' . "\n" . $__assert;
+		$command .= 'lunch ' . $lunch_rom . '_' . $device . '-' . $lunch_flavor . "\n" . $__assert;
 
 		if ($clobber) {
 			$command .= 'make clobber -j' . $jobs . "\n" . $__assert;

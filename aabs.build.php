@@ -10,13 +10,13 @@ build_rom("NexusOS", "lineage");
 build_rom("ResurrectionRemix", "lineage");
 build_rom("AOKP", "aokp");
 
-function build_rom($rom, $device_prefix) {
+function build_rom($rom, $lunch_rom) {
 	// check if ROM is disabled
 	if (AABS_ROMS != "*" && strpos(AABS_ROMS . " ", "{$rom} ") === false) {
 		return;
 	}
 
-	aabs_build($rom, $device_prefix, array(
+	aabs_build($rom, $lunch_rom, 'eng', array(
 		// G92[0/5]F/I
 		'zerofltexx' => array(
 			'clean'   => array( "lineage_zerofltexx-ota-*.zip", "lineage-*-zerofltexx.zip" ),
