@@ -22,17 +22,28 @@ function upload_to_local($data) {
 	$uploadfile = $data['upload']['file'];
 	$uploadpath = "{$uploaddir}/{$uploadfile}";
 
+	$cp_command = "pv";
+	$cp_command_args = "-v";
+	if (!command_exists($cp_command)) {
+		$cp_command = "rsync";
+		$cp_command_args = "--progress --human-readable";
+		if (!command_exists($cp_command)) {
+			$cp_command = "cp";
+			$cp_command_args = "-v";
+		}
+	}
+
 	echo "Creating upload-directory...\n";
 	xexec("mkdir -p \"{$uploaddir}\"");
 
 	echo "Uploading build...\n";
-	xexec("pv \"{$output}\" > \"{$uploaddir}/.{$uploadfile}\"");
+	xexec("{$cp_command} {$cp_command_args} \"{$output}\" > \"{$uploaddir}/.{$uploadfile}\"");
 
 	echo "Make build visible...\n";
 	xexec("mv \"{$uploaddir}/.{$uploadfile}\" \"{$uploadpath}\"");
 
 	foreach ($hashes as $hash => $file) {
 		echo "Uploading {$hash}sum...\n";
-		xexec("pv \"{$file}\" > \"{$uploadpath}.{$hash}sum\"");
+		xexec("{$cp_command} {$cp_command_args} \"{$file}\" > \"{$uploadpath}.{$hash}sum\"");
 	}
 }
