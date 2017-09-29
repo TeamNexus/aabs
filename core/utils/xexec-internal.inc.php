@@ -36,7 +36,7 @@ function xexec_internal($cmdline, $censoring = array( )) {
 	}
 
 	echo "{$dcmdline}\n";
-	passthru($cmdline);
+	system($cmdline, $rc);
 
 	if ($is_external && $tempfile != "") {
 		unlink($tempfile);
