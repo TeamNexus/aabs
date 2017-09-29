@@ -16,5 +16,5 @@
  */
 
 function command_exists($cmd) {
-    return xexec_return("which \"$cmd\"", null, array( 1 )) === true;
+    return xexec_return("which \"$cmd\" > /dev/null 2>&1", null, array( 1 )) === true;
 }
