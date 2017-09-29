@@ -1,6 +1,6 @@
 <?php
 
-$options = getopt("hsbpud::r::", array( "help", "skip-sync", "skip-build", "skip-patch", "skip-upload", "devices::", "roms::" ));
+$options = getopt("hsbpud::r::l:", array( "help", "skip-sync", "skip-build", "skip-patch", "skip-upload", "devices::", "roms::", "log:" ));
 foreach ($options as $key => $value) {
 	switch ($key) {
 		case "h":
@@ -56,6 +56,15 @@ foreach ($options as $key => $value) {
 			define("AABS_ROMS", $value);
 			break;
 
+
+		case "l":
+		case "log":
+			if (defined("AABS_LOG"))
+				goto help;
+
+			define("AABS_LOG", $value);
+			break;
+
 		default:
 help:
 			echo "aabs: invalid option \"{$key}\"\n";
@@ -67,6 +76,7 @@ help:
 			echo "	-u, --skip-upload	  Don't upload the ROM\n";
 			echo "	-d, --devices		  Devices which should be built by AABS (Comma-separated, Have to be defined in aabs.build.php)\n";
 			echo "	-r, --roms			 ROMS which should be built by AABS (Comma-separated, Have to be defined in aabs.build.php)\n";
+			echo "	-l, --log			 Redirect output to given file and console\n";
 			echo "\n";
 			exit;
 	}
@@ -76,6 +86,9 @@ if (is_file(dirname($argv[0]) . "/../aabs.config.php"))
 	include dirname($argv[0]) . "/../aabs.config.php";
 
 include dirname($argv[0]) . "/aabs.config.php";
+
+if (defined("AABS_LOG"))
+	include dirname($argv[0]) . "/core/inc/logger.inc.php";
 
 if (!defined("AABS_SKIP_SYNC"))
 	define("AABS_SKIP_SYNC", false);
