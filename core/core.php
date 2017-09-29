@@ -111,13 +111,13 @@ help:
 	}
 }
 
-if (is_file(dirname($argv[0]) . "/../aabs.config.php"))
-	include dirname($argv[0]) . "/../aabs.config.php";
+if (is_file(AABS_BASEDIR . "/../aabs.config.php"))
+	include AABS_BASEDIR . "/../aabs.config.php";
 
-include dirname($argv[0]) . "/aabs.config.php";
+include AABS_BASEDIR . "/aabs.config.php";
 
 if (defined("AABS_LOG"))
-	include dirname($argv[0]) . "/core/inc/logger.inc.php";
+	include AABS_BASEDIR . "/core/inc/logger.inc.php";
 
 if (!defined("AABS_SKIP_SYNC"))
 	define("AABS_SKIP_SYNC", false);
@@ -137,7 +137,7 @@ if (!defined("AABS_DEVICES"))
 if (!defined("AABS_ROMS"))
 	define("AABS_ROMS", "*");
 
-if (is_file(dirname($argv[0]) . "/../aabs.build.php"))
-	include dirname($argv[0]) . "/../aabs.build.php";
+if (is_file(AABS_BASEDIR . "/../aabs.build.php"))
+	include AABS_BASEDIR . "/../aabs.build.php";
 else
-	include dirname($argv[0]) . "/aabs.build.php";
+	include AABS_BASEDIR . "/aabs.build.php";
