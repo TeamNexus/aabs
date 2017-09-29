@@ -91,11 +91,13 @@ function build_rom($rom, $lunch_rom) {
 
 	// builds
 	aabs_upload($rom, "zero", "zerofltexx", "lineage_zerofltexx-ota-*.zip", BUILD_TYPE_BUILD);
+	aabs_upload($rom, "zero", "zerofltespr", "lineage_zerofltespr-ota-*.zip", BUILD_TYPE_BUILD);
+	aabs_upload($rom, "zero", "zerofltecan", "lineage_zerofltecan-ota-*.zip", BUILD_TYPE_BUILD);
 	aabs_upload($rom, "zero", "zeroflteskt", "lineage_zeroflteskt-ota-*.zip", BUILD_TYPE_BUILD);
 
 	// kernels
 	aabs_upload($rom, "zero", "zeroltexx", "boot.img", BUILD_TYPE_BOOT);
-	aabs_upload($rom, "zero", "zerofltespr", "boot.img", BUILD_TYPE_BOOT);
 	aabs_upload($rom, "zero", "zeroltespr", "boot.img", BUILD_TYPE_BOOT);
+	aabs_upload($rom, "zero", "zeroltecan", "boot.img", BUILD_TYPE_BOOT);
 	aabs_upload($rom, "zero", "zerolteskt", "boot.img", BUILD_TYPE_BOOT);
 }
