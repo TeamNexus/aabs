@@ -16,32 +16,46 @@
  */
 
 /*
- * OVERRIDE: Enforce to skip the sync of the sources
+ * Default value for skipping syncing sources
  * @default false
  */
-/* if (!defined('AABS_SKIP_SYNC'))
-	define('AABS_SKIP_SYNC', false); */
+if (!defined('AABS_SKIP_SYNC'))
+	define('AABS_SKIP_SYNC', false);
 
 /*
- * OVERRIDE: Enforce to skip the upload of the builds
+ * Default value for skipping building
  * @default false
  */
-/* if (!defined('AABS_SKIP_UPLOAD'))
-	define('AABS_SKIP_UPLOAD', false); */
+if (!defined("AABS_SKIP_BUILD"))
+	define("AABS_SKIP_BUILD", false);
 
 /*
- * OVERRIDE: Enforced list of devices to build
- * @default "*"
+ * Default value for skipping build-patching
+ * @default false
  */
-/* if (!defined('AABS_DEVICES'))
-	define('AABS_DEVICES', "*"); */
+if (!defined("AABS_SKIP_PATCH"))
+	define("AABS_SKIP_PATCH", false);
 
 /*
- * OVERRIDE: Enforced list of ROMs to build
+ * Default value for skipping uploading builds
+ * @default false
+ */
+if (!defined('AABS_SKIP_UPLOAD'))
+	define('AABS_SKIP_UPLOAD', false);
+
+/*
+ * Default list of devices to build
  * @default "*"
  */
-/* if (!defined('AABS_ROMS'))
-	define('AABS_ROMS', "*"); */
+if (!defined('AABS_DEVICES'))
+	define('AABS_DEVICES', "*");
+
+/*
+ * Default list of ROMs to build
+ * @default "*"
+ */
+if (!defined('AABS_ROMS'))
+	define('AABS_ROMS', "*");
 
 /*
  * Count of concurrent jobs used to sync the sources
