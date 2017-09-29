@@ -17,7 +17,7 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 	}
 
 	// check if ROM is supported and existing
-	if (!__validate_rom($rom)) {
+	if (!validate_rom($rom)) {
 		return;
 	}
 
@@ -75,5 +75,5 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 		$command .= "\n";
 	}
 
-	__exec($command);
+	xexec($command);
 }

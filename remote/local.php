@@ -8,16 +8,16 @@ function upload_to_local($data) {
 	$uploadpath = "{$uploaddir}/{$uploadfile}";
 
 	echo "Creating upload-directory...\n";
-	__exec("mkdir -p \"{$uploaddir}\"");
+	xexec("mkdir -p \"{$uploaddir}\"");
 
 	echo "Uploading build...\n";
-	__exec("pv \"{$output}\" > \"{$uploaddir}/.{$uploadfile}\"");
+	xexec("pv \"{$output}\" > \"{$uploaddir}/.{$uploadfile}\"");
 
 	echo "Make build visible...\n";
-	__exec("mv \"{$uploaddir}/.{$uploadfile}\" \"{$uploadpath}\"");
+	xexec("mv \"{$uploaddir}/.{$uploadfile}\" \"{$uploadpath}\"");
 
 	foreach ($hashes as $hash => $file) {
 		echo "Uploading {$hash}sum...\n";
-		__exec("pv \"{$file}\" > \"{$uploadpath}.{$hash}sum\"");
+		xexec("pv \"{$file}\" > \"{$uploadpath}.{$hash}sum\"");
 	}
 }

@@ -12,7 +12,7 @@ function aabs_sync($rom) {
 	}
 
 	// check if ROM is supported and existing
-	if (!__validate_rom($rom)) {
+	if (!validate_rom($rom)) {
 		return;
 	}
 
@@ -31,5 +31,5 @@ function aabs_sync($rom) {
 	$command .= 'repo sync -c -d -f --force-sync --no-clone-bundle --jobs=' . AABS_SYNC_JOBS . "\n" . $__assert;
 	$command .= "\n";
 
-	__exec($command);
+	xexec($command);
 }

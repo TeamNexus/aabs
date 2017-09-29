@@ -13,18 +13,18 @@ function upload_to_mega($data) {
 	$pass = str_replace("\"", "\\\"", $pass);
 
 	echo "Trying to login to mega.nz...\n";
-	$login = __exec_ret("mega-login \"{$user}\" \"{$pass}\"", array( $pass ), array( 202, 255 ));
+	$login = xexec_return("mega-login \"{$user}\" \"{$pass}\"", array( $pass ), array( 202, 255 ));
 	if ($login !== 0 && $login !== 202) {
-		__exec("screen -d -S \"aabs-mega-cmd\" -m \"mega-cmd\"");
+		xexec("screen -d -S \"aabs-mega-cmd\" -m \"mega-cmd\"");
 		sleep(5);
-		__exec_ret("mega-login \"{$user}\" \"{$pass}\"", array( $pass ), array( 202 ));
+		xexec_return("mega-login \"{$user}\" \"{$pass}\"", array( $pass ), array( 202 ));
 	}
 
 	echo "Uploading build...\n";
-	__exec("mega-put \"{$output}\" -c \"{$uploaddir}/{$uploadfile}\"");
+	xexec("mega-put \"{$output}\" -c \"{$uploaddir}/{$uploadfile}\"");
 
 	foreach ($hashes as $hash => $file) {
 		echo "Uploading {$hash}sum...\n";
-		__exec("mega-put \"{$file}\" -c \"{$uploaddir}/{$uploadfile}.{$hash}sum\"");
+		xexec("mega-put \"{$file}\" -c \"{$uploaddir}/{$uploadfile}.{$hash}sum\"");
 	}
 }

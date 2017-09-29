@@ -7,7 +7,7 @@ function aabs_patch($rom, $device, $targets = array( )) {
 	}
 
 	// check if ROM is supported and existing
-	if (!__validate_rom($rom)) {
+	if (!validate_rom($rom)) {
 		return;
 	}
 
@@ -40,10 +40,10 @@ function aabs_patch($rom, $device, $targets = array( )) {
 	if (is_file("$tmp"))
 		unlink("$tmp");
 
-	__mkdir("{$tmp}/");
-	__mkdir("{$tmp}/patches/");
+	rmkdir("{$tmp}/");
+	rmkdir("{$tmp}/patches/");
 
-	__exec("unzip \"{$output_path}\" -d \"{$tmp}/\"");
+	xexec("unzip \"{$output_path}\" -d \"{$tmp}/\"");
 
 	$script_targets = array( );
 	foreach ($targets as $target_device => $target_options) {
@@ -62,7 +62,7 @@ function aabs_patch($rom, $device, $targets = array( )) {
 			);
 		}
 
-		__mkdir("{$target_patch_dir}");
+		rmkdir("{$target_patch_dir}");
 
 		foreach ($target_options['files'] as $target_file) {
 			if (is_array($target_file)) {
@@ -81,8 +81,8 @@ function aabs_patch($rom, $device, $targets = array( )) {
 
 			$target_file_dirname = dirname($target_file_dst);
 
-			__mkdir("{$target_file_dirname}");
-			__exec("cp -f {$target_file_src} {$target_file_dst}");
+			rmkdir("{$target_file_dirname}");
+			xexec("cp -f {$target_file_src} {$target_file_dst}");
 		}
 	}
 
@@ -207,7 +207,7 @@ function aabs_patch($rom, $device, $targets = array( )) {
 
 	file_put_contents($updater_script_path, $updater_script);
 
-	__exec("mv {$output_path} {$output_path}.bak");
-	__exec("cd {$tmp} && zip -r9 {$output_path} .");
-	__exec("rm -rfv {$tmp}");
+	xexec("mv {$output_path} {$output_path}.bak");
+	xexec("cd {$tmp} && zip -r9 {$output_path} .");
+	xexec("rm -rfv {$tmp}");
 }

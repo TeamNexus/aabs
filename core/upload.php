@@ -7,7 +7,7 @@ function aabs_upload($rom, $short_device, $device, $file_match, $type) {
 	}
 
 	// check if ROM is supported and existing
-	if (!__validate_rom($rom)) {
+	if (!validate_rom($rom)) {
 		return;
 	}
 
