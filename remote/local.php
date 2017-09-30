@@ -22,14 +22,11 @@ function upload_to_local($data) {
 	$uploadfile = $data['upload']['file'];
 	$uploadpath = "{$uploaddir}/{$uploadfile}";
 
-	$cp_command = "pv";
-	$cp_command_args = "-v";
-	if (!command_exists($cp_command)) {
-		$cp_command = "rsync";
-		$cp_command_args = "--progress --human-readable";
-		if (!command_exists($cp_command)) {
-			$cp_command = "cp";
-			$cp_command_args = "-v";
+	$cp_cmd_base = "pv -petI %{src} > %{dst}";
+	if (!command_exists("pv")) {
+		$cp_cmd_base = "rsync --progress --human-readable %{src} %{dst}";
+		if (!command_exists("rsync")) {
+			$cp_cmd_base = "cp -v %{src} %{dst}";
 		}
 	}
 
@@ -37,13 +34,21 @@ function upload_to_local($data) {
 	xexec("mkdir -p \"{$uploaddir}\"");
 
 	echo "Uploading build...\n";
-	xexec("{$cp_command} {$cp_command_args} \"{$output}\" > \"{$uploaddir}/.{$uploadfile}\"");
+	$cp_cmd = __parse_cmd_base($cp_cmd_base, $output, "{$uploaddir}/.{$uploadfile}");
+	xexec("{$cp_cmd}");
 
 	echo "Make build visible...\n";
 	xexec("mv \"{$uploaddir}/.{$uploadfile}\" \"{$uploadpath}\"");
 
 	foreach ($hashes as $hash => $file) {
 		echo "Uploading {$hash}sum...\n";
-		xexec("{$cp_command} {$cp_command_args} \"{$file}\" > \"{$uploadpath}.{$hash}sum\"");
+
+		$cp_cmd = __parse_cmd_base($cp_cmd_base, $file, "{$uploadpath}.{$hash}sum");
+		xexec("{$cp_cmd}");
 	}
+}
+
+function __parse_cmd_base($cp_cmd_base, $src, $dst) {
+	$cmd = str_replace("%{src}", $src, $cp_cmd_base);
+	return str_replace("%{dst}", $dst, $cmd);
 }

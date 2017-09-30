@@ -25,4 +25,4 @@ if [ "${AABS_IS_DEV_MACHINE}" != "true" ]; then
 fi
 
 # Start AABS
-php "$AABS_PATH/aabs.php" "$AABS_PATH"
+php "$0.php" "$@"

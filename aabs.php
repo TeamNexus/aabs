@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-define('AABS_BASEDIR', $argv[1]);
+define('AABS_BASEDIR', dirname($argv[0]));
 define('AABS_START_TIME', time());
 
 // include global constants

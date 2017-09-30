@@ -26,9 +26,9 @@ foreach ($options as $key => $value) {
 		case "s":
 		case "skip-sync":
 			if (defined("AABS_SKIP_SYNC"))
-				goto help;
+				goto invalid;
 			if ($value !== false)
-				goto help;
+				goto invalid;
 
 			define("AABS_SKIP_SYNC", true);
 			break;
@@ -36,9 +36,9 @@ foreach ($options as $key => $value) {
 		case "b":
 		case "skip-build":
 			if (defined("AABS_SKIP_UPLOAD"))
-				goto help;
+				goto invalid;
 			if ($value !== false)
-				goto help;
+				goto invalid;
 
 			define("AABS_SKIP_BUILD", true);
 			break;
@@ -46,9 +46,9 @@ foreach ($options as $key => $value) {
 		case "p":
 		case "skip-patch":
 			if (defined("AABS_SKIP_PATCH"))
-				goto help;
+				goto invalid;
 			if ($value !== false)
-				goto help;
+				goto invalid;
 
 			define("AABS_SKIP_PATCH", true);
 			break;
@@ -56,9 +56,9 @@ foreach ($options as $key => $value) {
 		case "u":
 		case "skip-upload":
 			if (defined("AABS_SKIP_UPLOAD"))
-				goto help;
+				goto invalid;
 			if ($value !== false)
-				goto help;
+				goto invalid;
 
 			define("AABS_SKIP_UPLOAD", true);
 			break;
@@ -66,9 +66,9 @@ foreach ($options as $key => $value) {
 		case "d":
 		case "devices":
 			if (defined("AABS_SKIP_SYNC"))
-				goto help;
+				goto invalid;
 			if (!is_string($value) || empty($value))
-				goto help;
+				goto invalid;
 
 			define("AABS_DEVICES", $value);
 			break;
@@ -76,9 +76,9 @@ foreach ($options as $key => $value) {
 		case "r":
 		case "roms":
 			if (defined("AABS_ROMS"))
-				goto help;
+				goto invalid;
 			if (!is_string($value) || empty($value))
-				goto help;
+				goto invalid;
 
 			define("AABS_ROMS", $value);
 			break;
@@ -87,23 +87,26 @@ foreach ($options as $key => $value) {
 		case "l":
 		case "log":
 			if (defined("AABS_LOG"))
-				goto help;
+				goto invalid;
 			if (!is_string($value) || empty($value))
-				goto help;
+				goto invalid;
 
 			define("AABS_LOG", $value);
 			break;
 
 		default:
-help:
+invalid:
 			echo "aabs: invalid option \"{$key}\"\n";
-			echo "Usage: aabs [options]\n";
+help:
+			$argv0 = substr($argv[0], 0, strlen($argv[0]) - 4);
+			echo "Usage: {$argv0} [options]\n";
 			echo "Options:\n";
+			echo "	-h, --help           Show this help-screen\n";
 			echo "	-s, --skip-sync      No synchronization of ROM-sources\n";
 			echo "	-b, --skip-build     Skips building the ROM\n";
 			echo "	-u, --skip-patch     Don't run let AABS-patcher run over the build\n";
 			echo "	-u, --skip-upload    Don't upload the ROM\n";
-			echo "	-d, --devices		 Devices which should be built by AABS (Comma-separated, Have to be defined in aabs.build.php)\n";
+			echo "	-d, --devices        Devices which should be built by AABS (Comma-separated, Have to be defined in aabs.build.php)\n";
 			echo "	-r, --roms           ROMS which should be built by AABS (Comma-separated, Have to be defined in aabs.build.php)\n";
 			echo "	-l, --log            Redirect output to given file and console\n";
 			echo "\n";
