@@ -31,7 +31,7 @@ function build_rom($rom, $lunch_rom) {
 		return;
 	}
 
-	aabs_build($rom, $lunch_rom, 'user', array(
+	aabs_build($rom, $lunch_rom, 'userdebug', array(
 		// G92[0/5]F/I
 		'zerofltexx' => array(
 			'clean'   => array( "lineage_zerofltexx-ota-*.zip", "lineage-*-zerofltexx.zip" ),
