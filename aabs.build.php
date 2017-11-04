@@ -37,7 +37,7 @@ function build_rom($rom, $lunch_rom) {
 			'clean'   => array( "{$lunch_rom}_zerofltexx-ota-*.zip" ),
 			'clobber' => AABS_SOURCE_CLOBBER,
 			'match'   => "{$lunch_rom}_zerofltexx-ota-*.zip",
-			'targets' => "bacon",
+			'targets' => "otapackage",
 		),
 		'zeroltexx' => array(
 			'clean'   => array( "boot.img" ),
@@ -51,7 +51,7 @@ function build_rom($rom, $lunch_rom) {
 			'clean'   => array( "{$lunch_rom}_zerofltespr-ota-*.zip" ),
 			'clobber' => false,
 			'match'   => "{$lunch_rom}_zerofltespr-ota-*.zip",
-			'targets' => "bacon",
+			'targets' => "otapackage",
 		),
 		'zeroltespr' => array(
 			'clean'   => array( "boot.img" ),
@@ -65,7 +65,7 @@ function build_rom($rom, $lunch_rom) {
 			'clean'   => array( "{$lunch_rom}_zerofltecan-ota-*.zip" ),
 			'clobber' => false,
 			'match'   => "{$lunch_rom}_zerofltecan-ota-*.zip",
-			'targets' => "bacon",
+			'targets' => "otapackage",
 		),
 		'zeroltecan' => array(
 			'clean'   => array( "boot.img" ),
@@ -79,7 +79,7 @@ function build_rom($rom, $lunch_rom) {
 			'clean'   => array( "{$lunch_rom}_zeroflteskt-ota-*.zip" ),
 			'clobber' => false,
 			'match'   => "{$lunch_rom}_zeroflteskt-ota-*.zip",
-			'targets' => "bacon",
+			'targets' => "otapackage",
 		),
 		'zerolteskt' => array(
 			'clean'   => array( "boot.img" ),
