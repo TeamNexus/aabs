@@ -34,9 +34,9 @@ function build_rom($rom, $lunch_rom) {
 	aabs_build($rom, $lunch_rom, 'userdebug', array(
 		// G92[0/5]F/I
 		'zerofltexx' => array(
-			'clean'   => array( "lineage_zerofltexx-ota-*.zip", "lineage-*-zerofltexx.zip" ),
+			'clean'   => array( "{$lunch_rom}_zerofltexx-ota-*.zip" ),
 			'clobber' => AABS_SOURCE_CLOBBER,
-			'match'   => "lineage_zerofltexx-ota-*.zip",
+			'match'   => "{$lunch_rom}_zerofltexx-ota-*.zip",
 			'targets' => "bacon",
 		),
 		'zeroltexx' => array(
@@ -48,9 +48,9 @@ function build_rom($rom, $lunch_rom) {
 
 		// G92[0/5]P (and maybe more...)
 		'zerofltespr' => array(
-			'clean'   => array( "lineage_zerofltespr-ota-*.zip", "lineage-*-zerofltespr.zip" ),
+			'clean'   => array( "{$lunch_rom}_zerofltespr-ota-*.zip" ),
 			'clobber' => false,
-			'match'   => "lineage_zerofltespr-ota-*.zip",
+			'match'   => "{$lunch_rom}_zerofltespr-ota-*.zip",
 			'targets' => "bacon",
 		),
 		'zeroltespr' => array(
@@ -62,9 +62,9 @@ function build_rom($rom, $lunch_rom) {
 
 		// G92[0/5]T/W8
 		'zerofltecan' => array(
-			'clean'   => array( "lineage_zerofltecan-ota-*.zip", "lineage-*-zerofltecan.zip" ),
+			'clean'   => array( "{$lunch_rom}_zerofltecan-ota-*.zip" ),
 			'clobber' => false,
-			'match'   => "lineage_zerofltecan-ota-*.zip",
+			'match'   => "{$lunch_rom}_zerofltecan-ota-*.zip",
 			'targets' => "bacon",
 		),
 		'zeroltecan' => array(
@@ -76,9 +76,9 @@ function build_rom($rom, $lunch_rom) {
 
 		// G92[0/5]S/K/L
 		'zeroflteskt' => array(
-			'clean'   => array( "lineage_zeroflteskt-ota-*.zip", "lineage-*-zeroflteskt.zip" ),
+			'clean'   => array( "{$lunch_rom}_zeroflteskt-ota-*.zip" ),
 			'clobber' => false,
-			'match'   => "lineage_zeroflteskt-ota-*.zip",
+			'match'   => "{$lunch_rom}_zeroflteskt-ota-*.zip",
 			'targets' => "bacon",
 		),
 		'zerolteskt' => array(
