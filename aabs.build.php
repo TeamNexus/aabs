@@ -21,7 +21,7 @@ aabs_sync("ResurrectionRemix");
 aabs_sync("AOKP");
 
 build_rom("LineageOS", "lineage");
-build_rom("NexusOS", "gzosp");
+build_rom("NexusOS", "lineage");
 build_rom("ResurrectionRemix", "lineage");
 build_rom("AOKP", "aokp");
 
