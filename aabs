@@ -38,4 +38,9 @@ if [ "${AABS_IS_DEV_MACHINE}" != "true" ]; then
 fi
 
 # Start AABS
+if [ $# -eq 0 ]; then
+	php "$0.php" --help
+	exit 0
+fi
+
 php "$0.php" "$@"
