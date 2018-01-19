@@ -45,6 +45,19 @@ function build_rom($rom, $lunch_rom) {
 			'match'   => "boot.img",
 			'targets' => "bootimage",
 		),
+		// G92[0/5]FD
+		'zeroflteduo' => array(
+			'clean'   => array( "{$lunch_rom}zeroflteduo-ota-*.zip" ),
+			'clobber' => false,
+			'match'   => "{$lunch_rom}zeroflteduo-ota-*.zip",
+			'targets' => "otapackage",
+		),
+		'zerolteduo' => array(
+			'clean'   => array( "boot.img" ),
+			'clobber' => false,
+			'match'   => "boot.img",
+			'targets' => "bootimage",
+		),
 
 		// G92[0/5]P (and maybe more...)
 		'zerofltespr' => array(
@@ -91,12 +104,14 @@ function build_rom($rom, $lunch_rom) {
 
 	// builds
 	aabs_upload($rom, "zero", "zerofltexx", "{$lunch_rom}_zerofltexx-ota-*.zip", BUILD_TYPE_BUILD);
+	aabs_upload($rom, "zero", "zeroflteduo", "{$lunch_rom}_zeroflteduo-ota-*.zip", BUILD_TYPE_BUILD);
 	aabs_upload($rom, "zero", "zerofltespr", "{$lunch_rom}_zerofltespr-ota-*.zip", BUILD_TYPE_BUILD);
 	aabs_upload($rom, "zero", "zerofltecan", "{$lunch_rom}_zerofltecan-ota-*.zip", BUILD_TYPE_BUILD);
 	aabs_upload($rom, "zero", "zeroflteskt", "{$lunch_rom}_zeroflteskt-ota-*.zip", BUILD_TYPE_BUILD);
 
 	// kernels
 	aabs_upload($rom, "zero", "zeroltexx", "boot.img", BUILD_TYPE_BOOT);
+	aabs_upload($rom, "zero", "zerolteduo", "boot.img", BUILD_TYPE_BOOT);
 	aabs_upload($rom, "zero", "zeroltespr", "boot.img", BUILD_TYPE_BOOT);
 	aabs_upload($rom, "zero", "zeroltecan", "boot.img", BUILD_TYPE_BOOT);
 	aabs_upload($rom, "zero", "zerolteskt", "boot.img", BUILD_TYPE_BOOT);
