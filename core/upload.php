@@ -37,7 +37,7 @@ function aabs_upload($rom, $short_device, $device, $file_match, $type) {
 	}
 
 	$source_dir  = AABS_SOURCE_BASEDIR . "/{$rom}";
-	$output_dir  = "{$source_dir}/out/target/product/{$device}";
+	$output_dir  = get_output_directory($rom, $device, $source_dir);
 	$output_name = trim(shell_exec("/bin/bash -c \"basename {$output_dir}/{$file_match}\""), "\n\t");
 	$output_path = dirname("{$output_dir}/{$file_match}") . "/" . $output_name;
 

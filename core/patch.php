@@ -42,7 +42,7 @@ function aabs_patch($rom, $device, $targets = array( )) {
 	}
 
 	$source_dir  = AABS_SOURCE_BASEDIR . "/{$rom}";
-	$output_dir  = "{$source_dir}/out/target/product/{$device}";
+	$output_dir  = get_output_directory($rom, $device, $source_dir);
 	$output_name = trim(shell_exec("/bin/bash -c \"basename $output_dir/" . __get_output_match($rom, $device) . "\""), "\n\t");
 	$output_path = "{$output_dir}/{$output_name}";
 
@@ -67,7 +67,7 @@ function aabs_patch($rom, $device, $targets = array( )) {
 			continue;
 		}
 
-		$target_out_dir   = "{$source_dir}/out/target/product/{$target_device}";
+		$target_out_dir   = get_output_directory($rom, $target_device, $source_dir);
 		$target_patch_dir = "{$tmp}/patches/{$target_device}";
 
 		if (!isset($script_targets[$target_device])) {
