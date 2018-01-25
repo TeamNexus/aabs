@@ -26,5 +26,6 @@ function validate_rom($rom) {
 			return is_dir($sourcedir);
 	}
 
-	throw new Exception("Unsupported ROM: {$rom} (Supported: LineageOS, NexusOS, ResurrectionRemix, AOKP)");
+	echo "Unsupported ROM: {$rom} (Supported: LineageOS, NexusOS, ResurrectionRemix, AOKP)";
+	die();
 }
