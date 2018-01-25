@@ -27,12 +27,12 @@ function aabs_upload($rom, $short_device, $device, $file_match, $type) {
 	}
 
 	// check if ROM is disabled
-	if (AABS_ROMS != "*" && strpos(AABS_ROMS . " ", "{$rom} ") === false) {
+	if (AABS_ROMS != "*" && strpos(AABS_ROMS . ",", "{$rom},") === false) {
 		return;
 	}
 
 	// check if device is disabled
-	if (AABS_DEVICES != "*" && strpos(AABS_DEVICES . " ", "{$device} ") === false) {
+	if (AABS_DEVICES != "*" && strpos(AABS_DEVICES . ",", "{$device},") === false) {
 		return;
 	}
 

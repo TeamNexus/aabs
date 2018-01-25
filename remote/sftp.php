@@ -35,7 +35,7 @@ function upload_to_sftp($data) {
 		die("aabs_upload: failed to login to " . $host . ":" . $port . " (Using password: " . ($pass == "" ? "no" : "yes") . ")");
 
 	echo "Creating SFTP-session...\n";
-	if (!$sftp_conn = ssh2_sftp($connection))
+	if (!$sftp_conn = ssh2_sftp($ssh_conn))
 		die("aabs_upload: failed to create a SFTP-session");
 
 	echo "Creating upload-directory...\n";
@@ -57,7 +57,7 @@ function upload_to_sftp($data) {
 
 function upload($sftp_conn, $local_file, $upload_dir, $upload_file) {
 	$remote_stream = @fopen("ssh2.sftp://$sftp_conn$upload_dir/.$upload_file", 'w');
-	$local_stream  = @fopen($output, 'r');
+	$local_stream  = @fopen($local_file, 'r');
 
 	if (!flock($local_stream, LOCK_SH))
 		die("aabs_upload: failed to acquire lock for local file");
@@ -65,14 +65,36 @@ function upload($sftp_conn, $local_file, $upload_dir, $upload_file) {
 	$total   = filesize($local_file);
 	$current = 0;
 
-	echo "\rUploading \"{$local_file}\": {$current} / {$total}...";
+	printf("\rUploading \"%s\": %8.3f MB / %8.3f MB  @  %8.3d KB/s  (%5.2d%%)...",
+		$local_file, 0, 0, 0, 0);
 
+	$speed_time    = round(microtime(true) * 1000);
+	$speed_current = 0;
+	$speed         = 0;
+	
 	while(!feof($local_stream)) {
 		$buffer = fread($local_stream, 8192);
 		fwrite($remote_stream, $buffer, strlen($buffer));
 
-		$current += strlen($buffer);
-		echo "\rUploading \"{$local_file}\": {$current} / {$total}...";
+		$current         += strlen($buffer);
+		$percentage       = round($current / $total, 4) * 100;
+		$speed_time_curr  = round(microtime(true) * 1000);
+
+		$speed_time_diff = ($speed_time_curr - $speed_time);
+		if ($speed_time_diff >= 1000) {
+			$speed_current_diff = $current - $speed_current;
+			$speed = ($speed_current_diff / ($speed_time_diff / 1000));
+
+			$speed_current = $current;
+			$speed_time    = $speed_time_curr;
+
+			$displ_speed   = round($speed   / 1024       , 3);
+			$displ_current = round($current / 1024 / 1024, 3);
+			$displ_total   = round($total   / 1024 / 1024, 3);
+
+			printf("\rUploading \"%s\": %8.3f MB / %8.3f MB  @  %8.3d KB/s  (%5.2f%%)...",
+				$local_file, $displ_current, $displ_total, $displ_speed, $percentage);
+		}
 	}
 	fflush($remote_stream);
 

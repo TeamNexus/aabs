@@ -65,7 +65,7 @@ foreach ($options as $key => $value) {
 
 		case "d":
 		case "devices":
-			if (defined("AABS_SKIP_SYNC"))
+			if (defined("AABS_DEVICES"))
 				goto invalid;
 			if (!is_string($value) || empty($value))
 				goto invalid;
