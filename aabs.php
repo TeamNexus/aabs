@@ -15,26 +15,32 @@
  * limitations under the License.
  */
 
-define('AABS_BASEDIR', dirname($argv[0]));
+define('AABS_BASEDIR', realpath(dirname($argv[0])));
 define('AABS_START_TIME', time());
 
+// include parameters
+set_include_path(AABS_BASEDIR . PATH_SEPARATOR . AABS_BASEDIR . '/lib/phpseclib/phpseclib/phpseclib/');
+
 // include global constants
-include AABS_BASEDIR . "/core/const.php";
+include_once AABS_BASEDIR . "/core/const.php";
 
 // include utilities
-include AABS_BASEDIR . "/core/utils.php";
+include_once AABS_BASEDIR . "/core/utils.php";
+
+// include 3rd-party libraries
+include_once AABS_BASEDIR . "/lib/phpseclib.inc.php";
 
 // include remote-plugins
-include AABS_BASEDIR . "/remote/ftp.php";
-include AABS_BASEDIR . "/remote/local.php";
-include AABS_BASEDIR . "/remote/mega.php";
-include AABS_BASEDIR . "/remote/sftp.php";
+include_once AABS_BASEDIR . "/remote/ftp.php";
+include_once AABS_BASEDIR . "/remote/local.php";
+include_once AABS_BASEDIR . "/remote/mega.php";
+include_once AABS_BASEDIR . "/remote/sftp.php";
 
 // include core-functions
-include AABS_BASEDIR . "/core/sync.php";
-include AABS_BASEDIR . "/core/build.php";
-include AABS_BASEDIR . "/core/patch.php";
-include AABS_BASEDIR . "/core/upload.php";
+include_once AABS_BASEDIR . "/core/sync.php";
+include_once AABS_BASEDIR . "/core/build.php";
+include_once AABS_BASEDIR . "/core/patch.php";
+include_once AABS_BASEDIR . "/core/upload.php";
 
 // parse arguments, load configurations and start building
-include AABS_BASEDIR . "/core/core.php";
+include_once AABS_BASEDIR . "/core/core.php";

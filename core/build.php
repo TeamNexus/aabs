@@ -26,11 +26,6 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 		return;
 	}
 
-	// check if device is disabled
-	if (AABS_DEVICES != "*" && strpos(AABS_DEVICES . ",", "{$device},") === false) {
-		return;
-	}
-
 	// check if ROM is supported and existing
 	if (!validate_rom($rom)) {
 		return;

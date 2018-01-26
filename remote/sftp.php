@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+use phpseclib\Net\SFTP;
+
 function upload_to_sftp($data) {
 	$host = $data['remote']['host'];
 	$port = $data['remote']['port'];
@@ -26,80 +28,64 @@ function upload_to_sftp($data) {
 	$uploaddir = $data['upload']['dir'];
 	$uploadfile = $data['upload']['file'];
 
-	echo "Connecting to " . $host . ":" . $port . "...\n";
-	if (!$ssh_conn = ssh2_connect($host, $port))
-		die("aabs_upload: failed to establish connection to " . $host . ":" . $port);
-
-	echo "Authenicating...\n";
-	if (!ssh2_auth_password($ssh_conn, $user, $pass))
-		die("aabs_upload: failed to login to " . $host . ":" . $port . " (Using password: " . ($pass == "" ? "no" : "yes") . ")");
-
-	echo "Creating SFTP-session...\n";
-	if (!$sftp_conn = ssh2_sftp($ssh_conn))
-		die("aabs_upload: failed to create a SFTP-session");
-
-	echo "Creating upload-directory...\n";
-	if (!ssh2_exec($ssh_conn, "mkdir -p \"{$uploaddir}\""))
-		die("aabs_upload: failed to create upload-directory");
-
-	echo "Uploading build...\n";
-	upload($sftp_conn, $output, $uploaddir, "{$uploadfile}");
-
-	echo "Make build visible...\n";
-	if (!ssh2_exec($ssh_conn, "mv \"$uploaddir/.$uploadfile\" \"$uploaddir/$uploadfile\""))
-		die("aabs_upload: failed to rename uploaded build-file");
-
-	foreach ($hashes as $hash => $file) {
-		echo "Uploading {$hash}sum...\n";
-		upload($sftp_conn, $file, $uploaddir, "{$uploadfile}.{$hash}sum");
-	}
-}
-
-function upload($sftp_conn, $local_file, $upload_dir, $upload_file) {
-	$remote_stream = @fopen("ssh2.sftp://$sftp_conn$upload_dir/.$upload_file", 'w');
-	$local_stream  = @fopen($local_file, 'r');
-
-	if (!flock($local_stream, LOCK_SH))
-		die("aabs_upload: failed to acquire lock for local file");
-
-	$total   = filesize($local_file);
-	$current = 0;
-
-	printf("\rUploading \"%s\": %8.3f MB / %8.3f MB  @  %8.3d KB/s  (%5.2d%%)...",
-		$local_file, 0, 0, 0, 0);
-
+	$out_total     = filesize($output);
 	$speed_time    = round(microtime(true) * 1000);
 	$speed_current = 0;
-	$speed         = 0;
-	
-	while(!feof($local_stream)) {
-		$buffer = fread($local_stream, 8192);
-		fwrite($remote_stream, $buffer, strlen($buffer));
 
-		$current         += strlen($buffer);
-		$percentage       = round($current / $total, 4) * 100;
+	$uploadprgcb = function ($current) use($output, $out_total, &$speed_time, &$speed_current) {
+		$percentage       = round($current / $out_total, 4) * 100;
 		$speed_time_curr  = round(microtime(true) * 1000);
 
 		$speed_time_diff = ($speed_time_curr - $speed_time);
-		if ($speed_time_diff >= 1000) {
+		if ($speed_time_diff >= 10) {
 			$speed_current_diff = $current - $speed_current;
 			$speed = ($speed_current_diff / ($speed_time_diff / 1000));
 
+			$displ_speed   = round($speed     / 1024       , 3);
+			$displ_current = round($current   / 1024 / 1024, 3);
+			$displ_total   = round($out_total / 1024 / 1024, 3);
+
+			printf("\rUploading \"%s\": %10.3f MB / %10.3f MB  @  %10.3f KB/s  (%6.2f%%)... ",
+				$output, $displ_current, $displ_total, $displ_speed, $percentage);
+
 			$speed_current = $current;
 			$speed_time    = $speed_time_curr;
+		}
+	};
 
-			$displ_speed   = round($speed   / 1024       , 3);
-			$displ_current = round($current / 1024 / 1024, 3);
-			$displ_total   = round($total   / 1024 / 1024, 3);
+	echo "Connecting to " . $host . ":" . $port . "...\n";
+	$sftp = new SFTP($host, $port);
 
-			printf("\rUploading \"%s\": %8.3f MB / %8.3f MB  @  %8.3d KB/s  (%5.2f%%)...",
-				$local_file, $displ_current, $displ_total, $displ_speed, $percentage);
+	echo "Authenticating...\n";
+	if (!$sftp->login($user, $pass)) {
+		die("aabs_upload: failed to login to " . $host . ":" . $port . " (Using password: " . ($pass == "" ? "no" : "yes") . ")");
+	}
+
+	echo "Creating upload-directory...\n";
+	if (!$sftp->mkdir($uploaddir, 0775, true)) {
+		// if creation failed, check if it exists
+		if (!$sftp->realpath($uploaddir)) {
+			die("aabs_upload: failed to create to upload-directory");
 		}
 	}
-	fflush($remote_stream);
 
-	fclose($remote_stream);
-	fclose($local_stream);
+	echo "Uploading build...\n";
+	$speed_time = round(microtime(true) * 1000);
+	if (!$sftp->put("${uploaddir}/.${uploadfile}", $output, SFTP::SOURCE_LOCAL_FILE, -1, -1, $uploadprgcb)) {
+		die("aabs_upload: failed to upload build");
+		
+	}
+	call_user_func($uploadprgcb, $out_total);
+	echo "\n";
 
-	echo "\rUploading \"{$local_file}\": {$current} / {$total}\n";
+	echo "Make build visible...\n";
+	if (!$sftp->rename("${uploaddir}/.${uploadfile}", "${uploaddir}/${uploadfile}")) {
+		die("aabs_upload: failed to rename uploaded build");
+	}
+
+	echo "Uploading checksums...\n";
+	foreach ($hashes as $hash => $hashfile) {
+		echo "\t- {$hash}sum...\n";
+		$sftp->put("${uploaddir}/{$uploadfile}.{$hash}sum", $hashfile, SFTP::SOURCE_LOCAL_FILE);
+	}
 }
