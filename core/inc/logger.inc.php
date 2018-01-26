@@ -17,7 +17,8 @@
 
 if (function_exists("eio_dup2")) {
 	rmkdir(dirname(AABS_LOG));
-	$logfile = fopen(AABS_LOG, "w+");	
+	$logfile = fopen(AABS_LOG, "w+");
 	eio_dup2($logfile, STDOUT, EIO_PRI_MAX);
+	eio_dup2($logfile, STDERR, EIO_PRI_MAX);
 	eio_event_loop();
 }
