@@ -61,6 +61,11 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 		$match   = isset($cmd['match']) ? $cmd['match'] : "";
 		$targets = isset($cmd['targets']) ? $cmd['targets'] : "bacon";
 
+		if (AABS_IS_DRY_RUN) {
+			echo "building '$targets' for '$device' (clean: " . ($clean ? "true" : "false") . ", clobber: " . ($clobber ? "true" : "false") . ", jobs: $jobs)\n";
+			continue;
+		}
+		
 		foreach ($clean as $clean_file) {
 			$clean_path = "out/target/product/{$device}/" . $clean_file;
 
@@ -85,5 +90,6 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 		$command .= "\n";
 	}
 
-	xexec($command);
+	if (!AABS_IS_DRY_RUN)
+		xexec($command);
 }

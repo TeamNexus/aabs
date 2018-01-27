@@ -46,5 +46,9 @@ function aabs_sync($rom) {
 	$command .= 'repo sync -c -d -f --force-sync --no-clone-bundle --jobs=' . AABS_SYNC_JOBS . "\n" . $__assert;
 	$command .= "\n";
 
-	xexec($command);
+	if (!AABS_IS_DRY_RUN) {
+		xexec($command);
+	} else {
+		echo "syncing sources for '$rom'\n";
+	}
 }

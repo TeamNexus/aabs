@@ -41,29 +41,36 @@ function aabs_patch($rom, $device, $targets = array( )) {
 		return;
 	}
 
-	$source_dir  = AABS_SOURCE_BASEDIR . "/{$rom}";
-	$output_dir  = get_output_directory($rom, $device, $source_dir);
-	$output_name = trim(shell_exec("/bin/bash -c \"basename $output_dir/" . __get_output_match($rom, $device) . "\""), "\n\t");
-	$output_path = "{$output_dir}/{$output_name}";
+	if (!AABS_IS_DRY_RUN) {
+		$source_dir  = AABS_SOURCE_BASEDIR . "/{$rom}";
+		$output_dir  = get_output_directory($rom, $device, $source_dir);
+		$output_name = trim(shell_exec("/bin/bash -c \"basename $output_dir/" . __get_output_match($rom, $device) . "\""), "\n\t");
+		$output_path = "{$output_dir}/{$output_name}";
 
-	if (!is_file($output_path)) {
-		die("Output not found: \"{$output_path}\"\n");
+		if (!is_file($output_path)) {
+			die("Output not found: \"{$output_path}\"\n");
+		}
+
+		$tmp		 = tempnam(sys_get_temp_dir(), 'aabs-patch-');
+
+		if (is_file("$tmp"))
+			unlink("$tmp");
+
+		rmkdir("{$tmp}/");
+		rmkdir("{$tmp}/patches/");
+
+		xexec("unzip \"{$output_path}\" -d \"{$tmp}/\"");
 	}
-
-	$tmp		 = tempnam(sys_get_temp_dir(), 'aabs-patch-');
-
-	if (is_file("$tmp"))
-		unlink("$tmp");
-
-	rmkdir("{$tmp}/");
-	rmkdir("{$tmp}/patches/");
-
-	xexec("unzip \"{$output_path}\" -d \"{$tmp}/\"");
 
 	$script_targets = array( );
 	foreach ($targets as $target_device => $target_options) {
 		// check if device is disabled
 		if (AABS_DEVICES != "*" && strpos(AABS_DEVICES, "{$device} ") === false) {
+			continue;
+		}
+
+		if (AABS_IS_DRY_RUN) {
+			echo "patching '$target_device' into '$device'...\n";
 			continue;
 		}
 
@@ -100,6 +107,9 @@ function aabs_patch($rom, $device, $targets = array( )) {
 			xexec("cp -f {$target_file_src} {$target_file_dst}");
 		}
 	}
+
+	if (AABS_IS_DRY_RUN)
+		return;
 
 	$updater_script_path   = "{$tmp}/META-INF/com/google/android/updater-script";
 	$updater_script		= file_get_contents($updater_script_path);

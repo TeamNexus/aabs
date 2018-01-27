@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-$options = getopt("hsbpud:r:l:", array( "help", "skip-sync", "skip-build", "skip-patch", "skip-upload", "devices:", "roms:", "log:" ));
+$options = getopt("hsbpud:r:l:", array( "help", "skip-sync", "skip-build", "skip-patch", "skip-upload", "devices:", "roms:", "log:", "dry-run" ));
 foreach ($options as $key => $value) {
 	switch ($key) {
 		case "h":
@@ -83,7 +83,6 @@ foreach ($options as $key => $value) {
 			define("AABS_ROMS", $value);
 			break;
 
-
 		case "l":
 		case "log":
 			if (defined("AABS_LOG"))
@@ -92,6 +91,15 @@ foreach ($options as $key => $value) {
 				goto invalid;
 
 			define("AABS_LOG", $value);
+			break;
+
+		case "dry-run":
+			if (defined("AABS_IS_DRY_RUN"))
+				goto invalid;
+			if ($value !== false)
+				goto invalid;
+
+			define("AABS_IS_DRY_RUN", true);
 			break;
 
 		default:
@@ -139,6 +147,9 @@ if (!defined("AABS_DEVICES"))
 
 if (!defined("AABS_ROMS"))
 	define("AABS_ROMS", "*");
+
+if (!defined("AABS_IS_DRY_RUN"))
+	define("AABS_IS_DRY_RUN", false);
 
 if (is_file(AABS_BASEDIR . "/../aabs.build.php"))
 	include AABS_BASEDIR . "/../aabs.build.php";
