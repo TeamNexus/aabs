@@ -50,24 +50,6 @@ function build_rom($rom, $lunch_rom) {
 	aabs_upload($rom, "zero", "zeroltexx", "boot.img", BUILD_TYPE_BOOT);
 
 	aabs_build($rom, $lunch_rom, 'userdebug', array(
-		// G92[0/5]FD
-		'zeroflteduo' => array(
-			'clean'   => array( "{$lunch_rom}zeroflteduo-ota-*.zip" ),
-			'clobber' => false,
-			'match'   => "{$lunch_rom}zeroflteduo-ota-*.zip",
-			'targets' => "otapackage",
-		),
-		'zerolteduo' => array(
-			'clean'   => array( "boot.img" ),
-			'clobber' => false,
-			'match'   => "boot.img",
-			'targets' => "bootimage",
-		)
-	));
-	aabs_upload($rom, "zero", "zeroflteduo", "{$lunch_rom}_zeroflteduo-ota-*.zip", BUILD_TYPE_BUILD);
-	aabs_upload($rom, "zero", "zerolteduo", "boot.img", BUILD_TYPE_BOOT);
-
-	aabs_build($rom, $lunch_rom, 'userdebug', array(
 		// G92[0/5]P (and maybe more...)
 		'zerofltespr' => array(
 			'clean'   => array( "{$lunch_rom}_zerofltespr-ota-*.zip" ),
@@ -120,4 +102,22 @@ function build_rom($rom, $lunch_rom) {
 	));
 	aabs_upload($rom, "zero", "zeroflteskt", "{$lunch_rom}_zeroflteskt-ota-*.zip", BUILD_TYPE_BUILD);
 	aabs_upload($rom, "zero", "zerolteskt", "boot.img", BUILD_TYPE_BOOT);
+
+	aabs_build($rom, $lunch_rom, 'userdebug', array(
+		// G92[0/5]FD
+		'zeroflteduo' => array(
+			'clean'   => array( "{$lunch_rom}zeroflteduo-ota-*.zip" ),
+			'clobber' => false,
+			'match'   => "{$lunch_rom}zeroflteduo-ota-*.zip",
+			'targets' => "otapackage",
+		),
+		'zerolteduo' => array(
+			'clean'   => array( "boot.img" ),
+			'clobber' => false,
+			'match'   => "boot.img",
+			'targets' => "bootimage",
+		)
+	));
+	aabs_upload($rom, "zero", "zeroflteduo", "{$lunch_rom}_zeroflteduo-ota-*.zip", BUILD_TYPE_BUILD);
+	aabs_upload($rom, "zero", "zerolteduo", "boot.img", BUILD_TYPE_BOOT);
 }
