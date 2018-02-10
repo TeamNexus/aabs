@@ -28,7 +28,7 @@ include_once AABS_BASEDIR . "/core/const.php";
 include_once AABS_BASEDIR . "/core/utils.php";
 
 // include 3rd-party libraries
-include_once AABS_BASEDIR . "/lib/phpseclib.inc.php";
+include_once AABS_BASEDIR . "/lib/phpseclib/vendor/autoload.php";
 
 // include remote-plugins
 include_once AABS_BASEDIR . "/remote/ftp.php";
@@ -41,6 +41,10 @@ include_once AABS_BASEDIR . "/core/sync.php";
 include_once AABS_BASEDIR . "/core/build.php";
 include_once AABS_BASEDIR . "/core/patch.php";
 include_once AABS_BASEDIR . "/core/upload.php";
+include_once AABS_BASEDIR . "/core/upload-multi.php";
+
+// include classes
+include_once AABS_BASEDIR . "/core/class/UploadTask.class.php";
 
 // parse arguments, load configurations and start building
 include_once AABS_BASEDIR . "/core/core.php";
