@@ -52,7 +52,7 @@ function upload_to_ftp($data) {
 
 	foreach ($hashes as $hash => $file) {
 		echo "Uploading {$hash}sum...\n";
-		if (!ftp_put($file, "${uploaddir}/${uploadfile}.{$hash}sum", $output, FTP_BINARY))
+		if (!ftp_put($ftp_conn, "${uploaddir}/${uploadfile}.{$hash}sum", $file, FTP_BINARY))
 			die("aabs_upload: failed to upload {$hash}sum to \"${uploaddir}/${uploadfile}.{$hash}sum\"");
 	}
 }
