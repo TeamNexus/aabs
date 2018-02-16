@@ -19,7 +19,7 @@ define('AABS_BASEDIR', realpath(dirname($argv[0])));
 define('AABS_START_TIME', time());
 
 // include parameters
-set_include_path(AABS_BASEDIR . PATH_SEPARATOR . AABS_BASEDIR . '/lib/phpseclib/phpseclib/phpseclib/');
+set_include_path(AABS_BASEDIR . PATH_SEPARATOR . AABS_BASEDIR . '/lib/phpseclib/vendor/phpseclib/phpseclib/phpseclib/');
 
 // include global constants
 include_once AABS_BASEDIR . "/core/const.php";
@@ -28,7 +28,7 @@ include_once AABS_BASEDIR . "/core/const.php";
 include_once AABS_BASEDIR . "/core/utils.php";
 
 // include 3rd-party libraries
-include_once AABS_BASEDIR . "/lib/phpseclib/vendor/autoload.php";
+require AABS_BASEDIR . "/lib/phpseclib/vendor/autoload.php";
 
 // include remote-plugins
 include_once AABS_BASEDIR . "/remote/ftp.php";
