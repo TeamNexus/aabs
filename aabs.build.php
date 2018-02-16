@@ -15,19 +15,21 @@
  * limitations under the License.
  */
 
+// aabs_sync("NexusOS");
 aabs_sync("LineageOS");
-aabs_sync("NexusOS");
 aabs_sync("ResurrectionRemix");
 aabs_sync("AOKP");
+aabs_sync("AICP");
 
-build_rom("LineageOS", "lineage");
 build_rom("NexusOS", "lineage");
-build_rom("ResurrectionRemix", "lineage");
+build_rom("LineageOS", "lineage");
+build_rom("ResurrectionRemix", "rr");
 build_rom("AOKP", "aokp");
+build_rom("AICP", "aicp");
 
 function build_rom($rom, $lunch_rom) {
 	// check if ROM is disabled
-	if (AABS_ROMS != "*" && strpos(AABS_ROMS . " ", "{$rom} ") === false) {
+	if (AABS_ROMS != "*" && strpos(AABS_ROMS . ",", "{$rom},") === false) {
 		return;
 	}
 
@@ -134,7 +136,7 @@ function build_rom($rom, $lunch_rom) {
 
 		// G92[0/5]T/W8
 		'zerofltecan' => array(
-			'match' => "{$lunch_rom}_zerofltespr-ota-*.zip",
+			'match' => "{$lunch_rom}_zerofltecan-ota-*.zip",
 			'type'  => BUILD_TYPE_BUILD,
 		),
 		'zeroltecan' => array(
