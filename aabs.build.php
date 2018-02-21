@@ -82,22 +82,6 @@ function build_rom($rom, $lunch_rom) {
 	));
 
 	aabs_build($rom, $lunch_rom, 'userdebug', array(
-		// G92[0/5]S/K/L
-		'zeroflteskt' => array(
-			'clean'   => array( "{$lunch_rom}_zeroflteskt-ota-*.zip" ),
-			'clobber' => false,
-			'match'   => "{$lunch_rom}_zeroflteskt-ota-*.zip",
-			'targets' => "otapackage",
-		),
-		'zerolteskt' => array(
-			'clean'   => array( "boot.img" ),
-			'clobber' => false,
-			'match'   => "boot.img",
-			'targets' => "bootimage",
-		),
-	));
-
-	aabs_build($rom, $lunch_rom, 'userdebug', array(
 		// G92[0/5]FD
 		'zeroflteduo' => array(
 			'clean'   => array( "{$lunch_rom}zeroflteduo-ota-*.zip" ),
@@ -140,16 +124,6 @@ function build_rom($rom, $lunch_rom) {
 			'type'  => BUILD_TYPE_BUILD,
 		),
 		'zeroltecan' => array(
-			'match' => "boot.img",
-			'type'  => BUILD_TYPE_BOOT,
-		),
-
-		// G92[0/5]S/K/L
-		'zeroflteskt' => array(
-			'match' => "{$lunch_rom}_zeroflteskt-ota-*.zip",
-			'type'  => BUILD_TYPE_BUILD,
-		),
-		'zerolteskt' => array(
 			'match' => "boot.img",
 			'type'  => BUILD_TYPE_BOOT,
 		),
