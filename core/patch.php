@@ -103,7 +103,7 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 			"if ({$target_kernel_flash_command}) then\n" .
 			($options['silence'] ? "" : "{$options['log_indention']}ui_print(\"     Selecting kernel for target: {$target_device}\");\n") .
 			($options['silence'] ? "" : "{$options['log_indention']}ui_print(\" \");\n") .
-			"    package_extract_file(\"boot.img\", \"{$target_ota_file_path}\");\n" .
+			"    package_extract_file(\"{$target_ota_file_path}\", \"{$scripting_kernel_target}\");\n" .
 			"endif;\n";
 		;
 
