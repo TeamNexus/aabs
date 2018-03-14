@@ -49,6 +49,18 @@ function build_rom($rom, $lunch_rom) {
 			'match'   => "boot.img",
 			'targets' => "bootimage",
 		),
+		'zerofltecan' => array(
+			'clean'   => array( "boot.img" ),
+			'clobber' => false,
+			'match'   => "boot.img",
+			'targets' => "bootimage",
+		),
+		'zeroltecan' => array(
+			'clean'   => array( "boot.img" ),
+			'clobber' => false,
+			'match'   => "boot.img",
+			'targets' => "bootimage",
+		),
 	));
 	aabs_patch($rom, array(
 		'silence' => false,
@@ -66,6 +78,18 @@ function build_rom($rom, $lunch_rom) {
 			'aliases' => array(
 				'zerolte',
 				'zerolteskt',
+			)
+		),
+		'zerofltecan' => array(
+			'types' => array( "BOOT" ),
+			'aliases' => array(
+				'zerofltecan',
+			)
+		),
+		'zeroltecan' => array(
+			'types' => array( "BOOT" ),
+			'aliases' => array(
+				'zeroltecan',
 			)
 		),
 	));
@@ -109,80 +133,6 @@ function build_rom($rom, $lunch_rom) {
 		),
 	));
 
-	/*
-	 * G92[0/5]T/W8
-	 */
-	aabs_build($rom, $lunch_rom, 'userdebug', array(
-		'zerofltecan' => array(
-			'clean'   => array( "{$lunch_rom}_zerofltecan-ota-*.zip" ),
-			'clobber' => false,
-			'match'   => "{$lunch_rom}_zerofltecan-ota-*.zip",
-			'targets' => "otapackage",
-		),
-		'zeroltecan' => array(
-			'clean'   => array( "boot.img" ),
-			'clobber' => false,
-			'match'   => "boot.img",
-			'targets' => "bootimage",
-		),
-	));
-	aabs_patch($rom, array(
-		'silence' => false,
-		'log_indention' => ($rom == "NexusOS" ? "    " : "")
-	), "zerofltecan", "{$lunch_rom}_zerofltecan-ota-*.zip", array(
-		'zerofltecan' => array(
-			'types' => array( "BOOT" ),
-			'aliases' => array(
-				'zerofltetmo',
-			)
-		),
-		'zeroltecan' => array(
-			'types' => array( "BOOT" ),
-			'aliases' => array(
-				'zeroltetmo',
-			)
-		),
-	));
-
-	/*
-	 * G92[0/5]FD
-	 */
-	aabs_build($rom, $lunch_rom, 'userdebug', array(
-		'zeroflteduo' => array(
-			'clean'   => array( "{$lunch_rom}zeroflteduo-ota-*.zip" ),
-			'clobber' => false,
-			'match'   => "{$lunch_rom}zeroflteduo-ota-*.zip",
-			'targets' => "otapackage",
-		),
-		'zerolteduo' => array(
-			'clean'   => array( "boot.img" ),
-			'clobber' => false,
-			'match'   => "boot.img",
-			'targets' => "bootimage",
-		),
-	));
-	aabs_patch($rom, array(
-		'silence' => false,
-		'log_indention' => ($rom == "NexusOS" ? "    " : "")
-	), "zeroflteduo", "{$lunch_rom}_zeroflteduo-ota-*.zip", array(
-		'zeroflteduo' => array(
-			'types' => array( "BOOT" ),
-			'aliases' => array(
-				'zerofltexx',
-				'zeroflte',
-				'zeroflteduo',
-			)
-		),
-		'zerolteduo' => array(
-			'types' => array( "BOOT" ),
-			'aliases' => array(
-				'zeroltexx',
-				'zerolte',
-				'zerolteduo',
-			)
-		),
-	));
-
 	aabs_upload_multi($rom, "zero", array( 'jobs' => 4 ), array(
 		// G92[0/5]F/I/S/K/L
 		'zerofltexx' => array(
@@ -193,18 +143,6 @@ function build_rom($rom, $lunch_rom) {
 		// G92[0/5]P (and maybe more...)
 		'zerofltespr' => array(
 			'match' => "{$lunch_rom}_zerofltespr-ota-*.zip",
-			'type'  => BUILD_TYPE_BUILD,
-		),
-
-		// G92[0/5]T/W8
-		'zerofltecan' => array(
-			'match' => "{$lunch_rom}_zerofltecan-ota-*.zip",
-			'type'  => BUILD_TYPE_BUILD,
-		),
-
-		// G92[0/5]FD
-		'zeroflteduo' => array(
-			'match' => "{$lunch_rom}_zeroflteduo-ota-*.zip",
 			'type'  => BUILD_TYPE_BUILD,
 		),
 	));
