@@ -17,15 +17,9 @@
 
 function validate_rom($rom) {
 	$sourcedir = AABS_SOURCE_BASEDIR . "/{$rom}";
+	if (is_dir($sourcedir))
+		return true;
 
-	switch ($rom) {
-		case "NexusOS":
-		case "LineageOS":
-		case "ResurrectionRemix":
-		case "AOKP":
-			return is_dir($sourcedir);
-	}
-
-	echo "Unsupported ROM: {$rom} (Supported: LineageOS, NexusOS, ResurrectionRemix, AOKP)";
+	echo "ROM not found: {$rom}";
 	die();
 }
