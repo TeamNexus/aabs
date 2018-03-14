@@ -1,4 +1,4 @@
-AABS
+ AABS
 ==========
 Automated Android Build Script
 ----------
@@ -7,22 +7,17 @@ Dependencies
 ==========
 Minimal requirements: (Sync and build)
 
-  * System: bash, cd, cp, mkdir, rm, unzip, zip
-  * System: make, repo
-  * PHP 5.6
-  * PHP: Enabled `system` and `shell_exec`
-
-Recommended requirements: (Sync, build and patch)
-
-  * **Minimal requirements: (Sync and build) +**
-  * PHP: pcre-extension
+  * Basic requirements for building AOSP
+  * PHP (at least version 5.6)
+  * PHP-functions `system' and `tempnam' enabled and no openbase_dir set
 
 Recommended requirements: (Sync, build, patch and upload)
 
-  * **Recommended requirements: (Sync, build and patch) +**
-  * System: megacmd (https://mega.nz/cmd)
-  * PHP: ftp-extension (with SSL-support)
-  * PHP: sftp-extension
+  * **Minimal requirements (Sync and build)**
+  * And depending on the upload-target:
+    * For MEGA: megacmd (+ available in PATH-variable)
+	* For FTP: (PHP) ftp
+	* For SFTP: (PHP) mcrypt (required for phpseclib)
 
 Getting started
 ==========
