@@ -51,7 +51,7 @@ Command Line-Options
 License
 ==========
 Automated Android Build Script - Simple and automated Android Build-Script
-Copyright (C) 2017  Lukas Berger
+Copyright (C) 2017-2018  Lukas Berger
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
