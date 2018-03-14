@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+if (!class_exists('UploadTask')) return;
+
 function aabs_upload_multi($rom, $short_device, $options, $targets) {
 	// check if uploading is disabled
 	if (AABS_SKIP_UPLOAD) {
