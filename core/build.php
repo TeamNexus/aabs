@@ -51,7 +51,7 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 
 	foreach($targets_combinations as $device => $cmd) {
 		// check if device is disabled
-		if (AABS_DEVICES != "*" && strpos(AABS_DEVICES, "{$device} ") === false) {
+		if (AABS_DEVICES != "*" && strpos(AABS_DEVICES . ",", "{$device},") === false) {
 			continue;
 		}
 
