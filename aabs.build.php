@@ -70,6 +70,9 @@ function build_rom($rom, $lunch_rom) {
 			'types' => array( "BOOT" ),
 			'aliases' => array(
 				'zeroflte',
+				'zerofltedv',
+				'zerofltektt',
+				'zerofltelgt',
 				'zeroflteskt',
 			)
 		),
@@ -77,19 +80,26 @@ function build_rom($rom, $lunch_rom) {
 			'types' => array( "BOOT" ),
 			'aliases' => array(
 				'zerolte',
+				'zeroltedv',
+				'zeroltektt',
+				'zeroltelgt',
 				'zerolteskt',
 			)
 		),
 		'zerofltecan' => array(
 			'types' => array( "BOOT" ),
 			'aliases' => array(
-				'zerofltecan',
+				'zerofltebmc',
+				'zerofltetmo',
+				'zeroflteue',
+				'zerofltemtr',
 			)
 		),
 		'zeroltecan' => array(
 			'types' => array( "BOOT" ),
 			'aliases' => array(
-				'zeroltecan',
+				'zeroltebmc',
+				'zeroltetmo',
 			)
 		),
 	));
@@ -118,16 +128,23 @@ function build_rom($rom, $lunch_rom) {
 		'zerofltespr' => array(
 			'types' => array( "BOOT" ),
 			'aliases' => array(
+				'zeroflteacg',
 				'zerofltechn',
+				'zerofltectc',
 				'zeroflteusc',
+				'zerofltezc',
+				'zerofltezh',
+				'zerofltezm',
 				'zerofltezt',
 			)
 		),
 		'zeroltespr' => array(
 			'types' => array( "BOOT" ),
 			'aliases' => array(
+				'zerolteacg',
 				'zeroltechn',
 				'zerolteusc',
+				'zeroltezc',
 				'zeroltezt',
 			)
 		),
