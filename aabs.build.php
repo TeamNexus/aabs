@@ -155,6 +155,9 @@ function build_rom($rom, $lunch_rom) {
 		'zerofltexx' => array(
 			'match' => "{$lunch_rom}_zerofltexx-ota-*.zip",
 			'type'  => BUILD_TYPE_BUILD,
+			'var-overrides' => array(
+				'device' => "zero-multitarget",
+			),
 		),
 
 		// G92[0/5]P (and maybe more...)
