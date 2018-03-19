@@ -63,7 +63,7 @@ function build_rom($rom, $lunch_rom) {
 		),
 	));
 	aabs_patch($rom, array(
-		'silence' => false,
+		'silence' => true,
 		'log_indention' => ($rom == "NexusOS" ? "    " : "")
 	), "zerofltexx", "{$lunch_rom}_zerofltexx-ota-*.zip", array(
 		'zerofltexx' => array(
@@ -122,7 +122,7 @@ function build_rom($rom, $lunch_rom) {
 		),
 	));
 	aabs_patch($rom, array(
-		'silence' => false,
+		'silence' => true,
 		'log_indention' => ($rom == "NexusOS" ? "    " : "")
 	), "zerofltespr", "{$lunch_rom}_zerofltespr-ota-*.zip", array(
 		'zerofltespr' => array(
