@@ -24,13 +24,15 @@ class UploadTask extends Thread {
 	private $device;
 	private $file_match;
 	private $type;
+	private $var_overrides;
 
-	public function __construct($rom, $short_device, $device, $file_match, $type) {
+	public function __construct($rom, $short_device, $device, $file_match, $type, $var_overrides) {
 		$this->rom = $rom;
 		$this->short_device = $short_device;
 		$this->device = $device;
 		$this->file_match = $file_match;
 		$this->type = $type;
+		$this->var_overrides = $var_overrides;
 	}
 
 	public function run() {
@@ -54,8 +56,22 @@ class UploadTask extends Thread {
 
 			$build_prop = file_get_contents("{$output_dir}/system/build.prop");
 
-			$upload_dir = do_path_variables($this->rom, $this->device, $this->short_device, $this->type, AABS_UPLOAD_DIR, $build_prop);
-			$upload_file = do_path_variables($this->rom, $this->device, $this->short_device, $this->type, AABS_UPLOAD_FILE, $build_prop);
+			$var_rom = $this->rom;
+			$var_device = $this->device;
+			$var_short_device = $this->short_device;
+			$var_type = $this->type;
+
+			if (isset($this->var_overrides['rom']))
+				$var_rom = $this->var_overrides['rom'];
+			if (isset($this->var_overrides['device']))
+				$var_device = $this->var_overrides['device'];
+			if (isset($this->var_overrides['short_device']))
+				$var_short_device = $this->var_overrides['short_device'];
+			if (isset($this->var_overrides['type']))
+				$var_type = $this->var_overrides['type'];
+
+			$upload_dir = do_path_variables($var_rom, $var_device, $var_short_device, $var_type, AABS_UPLOAD_DIR, $build_prop);
+			$upload_file = do_path_variables($var_rom, $var_device, $var_short_device, $var_type, AABS_UPLOAD_FILE, $build_prop);
 		}
 
 		$hash_methods = explode(",", AABS_HASH_METHODS);

@@ -38,7 +38,7 @@ function aabs_upload_multi($rom, $short_device, $options, $targets) {
 
 	$pool = new Pool($jobs);
 	foreach ($targets as $target_device => $target_data) {
-		$pool->submit(new UploadTask($rom, $short_device, $target_device, $target_data['match'], $target_data['type']));
+		$pool->submit(new UploadTask($rom, $short_device, $target_device, $target_data['match'], $target_data['type'], $target_data['var-overrides']));
 	}
 
 	$pool->shutdown();

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-function aabs_upload($rom, $short_device, $device, $file_match, $type) {
+function aabs_upload($rom, $short_device, $device, $file_match, $type, $overrides) {
 	// check if uploading is disabled
 	if (AABS_SKIP_UPLOAD) {
 		return;
@@ -51,8 +51,22 @@ function aabs_upload($rom, $short_device, $device, $file_match, $type) {
 
 		$build_prop = file_get_contents("{$output_dir}/system/build.prop");
 
-		$upload_dir = do_path_variables($rom, $device, $short_device, $type, AABS_UPLOAD_DIR, $build_prop);
-		$upload_file = do_path_variables($rom, $device, $short_device, $type, AABS_UPLOAD_FILE, $build_prop);
+		$var_rom = $rom;
+		$var_device = $device;
+		$var_short_device = $short_device;
+		$var_type = $type;
+
+		if (isset($overrides['rom']))
+			$var_rom = $overrides['rom'];
+		if (isset($overrides['device']))
+			$var_device = $overrides['device'];
+		if (isset($overrides['short_device']))
+			$var_short_device = $overrides['short_device'];
+		if (isset($overrides['type']))
+			$var_type = $overrides['type'];
+
+		$upload_dir = do_path_variables($var_rom, $var_device, $var_short_device, $var_type, AABS_UPLOAD_DIR, $build_prop);
+		$upload_file = do_path_variables($var_rom, $var_device, $var_short_device, $var_type, AABS_UPLOAD_FILE, $build_prop);
 	}
 
 	$hash_methods = explode(",", AABS_HASH_METHODS);
