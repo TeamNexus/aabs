@@ -82,10 +82,10 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 		}
 
 		// build.prop
-		$command .= 'make ' . get_output_directory($rom, $device, AABS_SOURCE_BASEDIR . "/{$rom}") . '/system/build.prop -j' . $jobs . "\n" . $__assert;
+		$sysprops_target = get_output_directory($rom, $device, AABS_SOURCE_BASEDIR . "/{$rom}") . '/system/build.prop';
 
 		// build-targets
-		$command .= 'make ' . $targets . ' -j' . $jobs . "\n" . $__assert;
+		$command .= 'make ' . $sysprops_target  . ' ' . $targets . ' -j' . $jobs . "\n" . $__assert;
 
 		$command .= "\n";
 	}
