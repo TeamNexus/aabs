@@ -14,32 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+define('PHPSECLIB_BASEDIR', AABS_BASEDIR . '/lib/phpseclib/vendor/phpseclib/phpseclib/phpseclib');
 
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/System/SSH/Agent.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/System/SSH/Agent/Identity.php";
+require_once PHPSECLIB_BASEDIR . "/System/SSH/Agent.php";
+require_once PHPSECLIB_BASEDIR . "/System/SSH/Agent/Identity.php";
 
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Math/BigInteger.php";
+require_once PHPSECLIB_BASEDIR . "/Math/BigInteger.php";
 
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/File/ANSI.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/File/ASN1.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/File/ASN1/Element.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/File/X509.php";
+require_once PHPSECLIB_BASEDIR . "/File/ANSI.php";
+require_once PHPSECLIB_BASEDIR . "/File/ASN1.php";
+require_once PHPSECLIB_BASEDIR . "/File/ASN1/Element.php";
+require_once PHPSECLIB_BASEDIR . "/File/X509.php";
 
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/Base.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/Rijndael.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/AES.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/Blowfish.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/DES.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/Hash.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/RC2.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/RSA.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/Random.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/RC4.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/TripleDES.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Crypt/Twofish.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/Base.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/Rijndael.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/AES.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/Blowfish.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/DES.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/Hash.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/RC2.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/RSA.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/Random.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/RC4.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/TripleDES.php";
+require_once PHPSECLIB_BASEDIR . "/Crypt/Twofish.php";
 
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Net/SCP.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Net/SSH1.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Net/SSH2.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Net/SFTP.php";
-require_once AABS_BASEDIR . "/lib/phpseclib/phpseclib/Net/SFTP/Stream.php";
+require_once PHPSECLIB_BASEDIR . "/Net/SCP.php";
+require_once PHPSECLIB_BASEDIR . "/Net/SSH1.php";
+require_once PHPSECLIB_BASEDIR . "/Net/SSH2.php";
+require_once PHPSECLIB_BASEDIR . "/Net/SFTP.php";
+require_once PHPSECLIB_BASEDIR . "/Net/SFTP/Stream.php";

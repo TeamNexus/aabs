@@ -28,7 +28,7 @@ include_once AABS_BASEDIR . "/core/const.php";
 include_once AABS_BASEDIR . "/core/utils.php";
 
 // include 3rd-party libraries
-require AABS_BASEDIR . "/lib/phpseclib/vendor/autoload.php";
+require AABS_BASEDIR . "/lib/phpseclib.inc.php";
 
 // include remote-plugins
 include_once AABS_BASEDIR . "/remote/ftp.php";
