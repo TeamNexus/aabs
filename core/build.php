@@ -43,8 +43,13 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 	$command .= "\n";
 	$command .= 'cd "' . AABS_SOURCE_BASEDIR . "/{$rom}" . '"' . "\n" . $__assert;
 	$command .= "\n";
-	$command .= 'export RR_BUILDTYPE=Unofficial' . "\n";
-	$command .= 'export WITH_ROOT_METHOD="magisk"' . "\n";
+	$command .= 'if [ -x $RR_BUILDTYPE ]; then' . "\n";
+	$command .= '	export RR_BUILDTYPE=Unofficial' . "\n";
+	$command .= 'fi' . "\n";
+	$command .= "\n";
+	$command .= 'if [ -x $WITH_ROOT_METHOD ]; then' . "\n";
+	$command .= '   export WITH_ROOT_METHOD="magisk"' . "\n";
+	$command .= 'fi' . "\n";
 	$command .= "\n";
 	$command .= 'source build/envsetup.sh' . "\n";
 	$command .= "\n";
