@@ -41,7 +41,7 @@ function build_rom($rom, $lunch_rom) {
 			'clean'   => array( "{$lunch_rom}_zerofltexx-ota-*.zip" ),
 			'clobber' => AABS_SOURCE_CLOBBER,
 			'match'   => "{$lunch_rom}_zerofltexx-ota-*.zip",
-			'targets' => "Snap otapackage",
+			'targets' => "otapackage",
 		),
 		'zeroltexx' => array(
 			'clean'   => array( "boot.img" ),
@@ -112,7 +112,7 @@ function build_rom($rom, $lunch_rom) {
 			'clean'   => array( "{$lunch_rom}_zerofltespr-ota-*.zip" ),
 			'clobber' => false,
 			'match'   => "{$lunch_rom}_zerofltespr-ota-*.zip",
-			'targets' => "Snap otapackage",
+			'targets' => "otapackage",
 		),
 		'zeroltespr' => array(
 			'clean'   => array( "boot.img" ),
