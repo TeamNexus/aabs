@@ -71,10 +71,32 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 			continue;
 		}
 		
+		$envvars = explode(",", AABS_ENV_VARIABLES);
+		foreach ($envvars as $envvar) {
+			if (empty($envvar)) {
+				continue;
+			}
+
+			$envdata = explode('=', $envvar, 2);
+
+			if (count($envdata) == 0) {
+				die("invalid environment variable: \"{$envvar}\"");
+			} elseif (count($envdata) == 1) {
+				$envname = $envdata[0];
+				$envval  = "true";
+			} else {
+				$envname = $envdata[0];
+				$envval  = $envdata[1];
+			}
+
+			$command .= "export {$envname}={$envval}\n" . $__assert;
+			$command .= "\n";
+		}
+		$command .= "\n";
+		
 		foreach ($clean as $clean_file) {
 			$clean_path = "out/target/product/{$device}/" . $clean_file;
 
-			$command .= "\n";
 			$command .= 'rm -fv ' . $clean_path . "\n" . $__assert;
 			$command .= 'rm -fv ' . $clean_path . '*' . "\n" . $__assert;
 			$command .= "\n";

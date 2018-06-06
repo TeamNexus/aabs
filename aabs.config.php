@@ -167,3 +167,10 @@ if (!defined('AABS_UPLOAD_FILE'))
  */
 if (!defined('AABS_HASH_METHODS'))
 	define('AABS_HASH_METHODS', "md5, sha1, sha256");
+
+/*
+ * Comma-seperated list of environment-variables to be defined
+ * @default ""
+ */
+if (!defined('AABS_ENV_VARIABLES'))
+	define('AABS_ENV_VARIABLES', "");
