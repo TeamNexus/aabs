@@ -22,6 +22,7 @@ function upload_to_ftp($data) {
 	$pass = $data['remote']['pass'];
 
 	$output = $data['output'];
+	$props = dirname($data['output']) . '/system/build.prop';
 	$hashes = $data['hashes'];
 	$uploaddir = $data['upload']['dir'];
 	$uploadfile = $data['upload']['file'];
@@ -49,6 +50,10 @@ function upload_to_ftp($data) {
 	echo "Make build visible...\n";
 	if (!ftp_rename($ftp_conn, "$uploaddir/.$uploadfile", "$uploaddir/$uploadfile"))
 		die("aabs_upload: failed to rename uploaded build-file");
+
+	echo "Uploading properties...\n";
+	if (!ftp_put($ftp_conn, "${uploaddir}/${uploadfile}.prop", $props, FTP_BINARY))
+		die("aabs_upload: failed to upload properties to \"${uploaddir}/${uploadfile}.prop\"");
 
 	foreach ($hashes as $hash => $file) {
 		echo "Uploading {$hash}sum...\n";

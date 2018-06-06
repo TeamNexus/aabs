@@ -20,6 +20,7 @@ function upload_to_mega($data) {
 	$pass = $data['remote']['pass'];
 
 	$output = $data['output'];
+	$props = dirname($data['output']) . '/system/build.prop';
 	$hashes = $data['hashes'];
 	$uploaddir = $data['upload']['dir'];
 	$uploadfile = $data['upload']['file'];
@@ -37,6 +38,9 @@ function upload_to_mega($data) {
 
 	echo "Uploading build...\n";
 	xexec("mega-put \"{$output}\" -c \"{$uploaddir}/{$uploadfile}\"");
+
+	echo "Uploading properties...\n";
+	xexec("mega-put \"{$props}\" -c \"{$uploaddir}/{$uploadfile}.prop\"");
 
 	foreach ($hashes as $hash => $file) {
 		echo "Uploading {$hash}sum...\n";

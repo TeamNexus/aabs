@@ -70,7 +70,7 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 			echo "building '$targets' for '$device' (clean: " . ($clean ? "true" : "false") . ", clobber: " . ($clobber ? "true" : "false") . ", jobs: $jobs)\n";
 			continue;
 		}
-		
+
 		$envvars = explode(",", AABS_ENV_VARIABLES);
 		foreach ($envvars as $envvar) {
 			if (empty($envvar)) {
@@ -93,7 +93,7 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 			$command .= "\n";
 		}
 		$command .= "\n";
-		
+
 		foreach ($clean as $clean_file) {
 			$clean_path = "out/target/product/{$device}/" . $clean_file;
 

@@ -17,6 +17,7 @@
 
 function upload_to_local($data) {
 	$output = $data['output'];
+	$props = dirname($data['output']) . '/system/build.prop';
 	$hashes = $data['hashes'];
 	$uploaddir = $data['upload']['dir'];
 	$uploadfile = $data['upload']['file'];
@@ -39,6 +40,10 @@ function upload_to_local($data) {
 
 	echo "Make build visible...\n";
 	xexec("mv \"{$uploaddir}/.{$uploadfile}\" \"{$uploadpath}\"");
+
+	echo "Uploading properties...\n";
+	$cp_cmd = __parse_cmd_base($cp_cmd_base, $props, "{$uploaddir}/{$uploadfile}.prop");
+	xexec("{$cp_cmd}");
 
 	foreach ($hashes as $hash => $file) {
 		echo "Uploading {$hash}sum...\n";

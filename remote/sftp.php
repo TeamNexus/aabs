@@ -24,6 +24,7 @@ function upload_to_sftp($data) {
 	$pass = $data['remote']['pass'];
 
 	$output = $data['output'];
+	$props = dirname($data['output']) . '/system/build.prop';
 	$hashes = $data['hashes'];
 	$uploaddir = $data['upload']['dir'];
 	$uploadfile = $data['upload']['file'];
@@ -81,6 +82,11 @@ function upload_to_sftp($data) {
 	echo "Make build visible...\n";
 	if (!$sftp->rename("${uploaddir}/.${uploadfile}", "${uploaddir}/${uploadfile}")) {
 		die("aabs_upload: failed to rename uploaded build");
+	}
+
+	echo "Uploading properties...\n";
+	if (!$sftp->put("${uploaddir}/${uploadfile}.prop", $props, SFTP::SOURCE_LOCAL_FILE, -1, -1, null)) {
+		die("aabs_upload: failed to upload properties");
 	}
 
 	echo "Uploading checksums...\n";
