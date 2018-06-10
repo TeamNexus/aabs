@@ -128,6 +128,22 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 	xexec("rm -fv {$output_path}.aabs.zip");
 	xexec("cd {$extracted_dir}; zip -r5 {$output_path}.aabs.zip .");
 
+	// sign OTA-package if requested
+	if (AABS_SIGN) {
+		$base_output_dir = get_base_output_directory($rom, $source_dir);
+
+		xexec("mv -fv {$output_path}.aabs.zip {$output_path}-unsigned.aabs.zip");
+
+		// sign OTA
+		xexec("cd {$source_dir}/; java " .
+			"-Xmx" . AABS_SIGN_MEMORY_LIMIT . " " .
+			"-Djava.library.path={$base_output_dir}/host/linux-x86/lib64 " .
+			"-jar {$base_output_dir}/host/linux-x86/framework/signapk.jar " .
+			"-w " . AABS_SIGN_PUBKEY . " " . AABS_SIGN_PRIVKEY . " " .
+			"{$output_path}-unsigned.aabs.zip " .
+			"{$output_path}.aabs.zip");
+	}
+
 	// clean up
 	xexec("rm -rfv {$extracted_dir}");
 	xexec("mv -fv {$output_path} {$output_path}.old");

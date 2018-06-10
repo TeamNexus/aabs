@@ -174,3 +174,31 @@ if (!defined('AABS_HASH_METHODS'))
  */
 if (!defined('AABS_ENV_VARIABLES'))
 	define('AABS_ENV_VARIABLES', "");
+
+/*
+ * Whether to sign patched builds
+ * @default true
+ */
+if (!defined('AABS_SIGN'))
+	define('AABS_SIGN', true);
+
+/*
+ * Java memory limit (-Xmx) for signapk
+ * @default "2048M"
+ */
+if (!defined('AABS_SIGN_MEMORY_LIMIT'))
+	define('AABS_SIGN_MEMORY_LIMIT', "2048M");
+
+/*
+ * Absolute or source-relative path to the public key for signing patched builds
+ * @default "build/target/product/security/testkey.x509.pem"
+ */
+if (!defined('AABS_SIGN_PUBKEY'))
+	define('AABS_SIGN_PUBKEY', "build/target/product/security/testkey.x509.pem");
+
+/*
+ * Absolute or source-relative path to the private key for signing patched builds
+ * @default "build/target/product/security/testkey.pk8"
+ */
+if (!defined('AABS_SIGN_PRIVKEY'))
+	define('AABS_SIGN_PRIVKEY', "build/target/product/security/testkey.pk8");
