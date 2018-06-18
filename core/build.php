@@ -97,8 +97,8 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 		foreach ($clean as $clean_file) {
 			$clean_path = "out/target/product/{$device}/" . $clean_file;
 
-			$command .= 'rm -fv ' . $clean_path . "\n" . $__assert;
-			$command .= 'rm -fv ' . $clean_path . '*' . "\n" . $__assert;
+			$command .= 'rm -rfv ' . $clean_path . "\n" . $__assert;
+			$command .= 'rm -rfv ' . $clean_path . '*' . "\n" . $__assert;
 			$command .= "\n";
 		}
 

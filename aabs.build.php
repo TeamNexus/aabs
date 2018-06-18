@@ -140,6 +140,61 @@ function build_rom($rom, $lunch_rom) {
 		),
 	));
 
+	/*
+	 * Recoveries for G92[0/5]F/I/S/K/L/P
+	 */
+	if ($rom == "NexusOS") {
+		aabs_build($rom, $lunch_rom, 'userdebug', array(
+			'zerofltexx' => array(
+				'clean'   => array( "recovery", "root", "recovery.img" ),
+				'clobber' => false,
+				'match'   => "recovery.img",
+				'targets' => "recoveryimage",
+			),
+			'zeroltexx' => array(
+				'clean'   => array( "recovery", "root", "recovery.img" ),
+				'clobber' => false,
+				'match'   => "recovery.img",
+				'targets' => "recoveryimage",
+			),
+			'zerofltespr' => array(
+				'clean'   => array( "recovery", "root", "recovery.img" ),
+				'clobber' => false,
+				'match'   => "recovery.img",
+				'targets' => "recoveryimage",
+			),
+			'zeroltespr' => array(
+				'clean'   => array( "recovery", "root", "recovery.img" ),
+				'clobber' => false,
+				'match'   => "recovery.img",
+				'targets' => "recoveryimage",
+			),
+		));
+
+		aabs_upload_multi($rom, "zero", array( 'jobs' => 4 ), array(
+			// G920F/I/S/K/L/T/W8
+			'zerofltexx' => array(
+				'match' => "recovery.img",
+				'type'  => BUILD_TYPE_RECOVERY,
+			),
+			// G925F/I/S/K/L/T/W8
+			'zeroltexx' => array(
+				'match' => "recovery.img",
+				'type'  => BUILD_TYPE_RECOVERY,
+			),
+			// G920P
+			'zerofltespr' => array(
+				'match' => "recovery.img",
+				'type'  => BUILD_TYPE_RECOVERY,
+			),
+			// G925P
+			'zeroltespr' => array(
+				'match' => "recovery.img",
+				'type'  => BUILD_TYPE_RECOVERY,
+			),
+		));
+	}
+
 	aabs_upload_multi($rom, "zero", array( 'jobs' => 4 ), array(
 		// G92[0/5]F/I/S/K/L/P
 		'zerofltexx' => array(

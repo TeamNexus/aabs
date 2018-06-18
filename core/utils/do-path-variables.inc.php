@@ -38,13 +38,17 @@ function do_path_variables($rom, $device, $short_device, $type, $input, $build_p
 		case BUILD_TYPE_BUILD:
 			$type_fileext = "zip";
 			break;
+		case BUILD_TYPE_PATCH:
+			$type_name = "Patch";
+			$type_fileext = "zip";
+			break;
 		case BUILD_TYPE_BOOT:
 			$type_name = "Kernel";
 			$type_fileext = "img";
 			break;
-		case BUILD_TYPE_PATCH:
-			$type_name = "Patch";
-			$type_fileext = "zip";
+		case BUILD_TYPE_RECOVERY:
+			$type_name = "Recovery";
+			$type_fileext = "img";
 			break;
 	}
 
