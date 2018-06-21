@@ -75,10 +75,10 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 		$updater_script;
 
 	// extract assert command
-	if (!preg_match('/assert\((.+) \|\| abort\("E3004: This package is for device:/s', $updater_script, $scripting_assert_preg)) {
+	if (!preg_match('/assert\(getprop\(".+this device is " \+ getprop\("ro\.product\.device"\) \+ "\."\);\);/s', $updater_script, $scripting_assert_preg)) {
 		die("Cannot continue to patch OTA-package: Failed to find asserting command\n");
 	}
-	$scripting_assert_command = $scripting_assert_preg[1];
+	$scripting_assert_command = $scripting_assert_preg[0];
 
 	// extract kernel-flash command
 	if (!preg_match('/package_extract_file\("boot\.img", "(.+)"\);/', $updater_script, $scripting_kernel_preg)) {
@@ -89,6 +89,7 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 
 	// compose new assert command
 	$target_assert_command = "";
+	$target_assert_devices = "";
 
 	// compose kernel flash-commands
 	$kernel_targets = 0;
@@ -102,9 +103,12 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 
 		// compose scripting-command
 		$target_kernel_flash_command = 'getprop("ro.product.name") == "' . $target_device . '"';
+		$target_assert_devices .= "{$target_device},";
 
-		foreach ($target['aliases'] as $target_alias)
+		foreach ($target['aliases'] as $target_alias) {
 			$target_kernel_flash_command .= ' || getprop("ro.product.name") == "' . $target_alias . '"';
+			$target_assert_devices .= "{$target_alias},";
+		}
 
 		if ($target_assert_command == "") {
 			$target_assert_command = $target_kernel_flash_command;
@@ -114,8 +118,8 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 
 		$target_kernel_flash_command =
 			"if ({$target_kernel_flash_command}) then\n" .
-			($options['silence'] ? "" : "{$options['log_indention']}ui_print(\"     Selecting kernel for target: {$target_device}\");\n") .
-			($options['silence'] ? "" : "{$options['log_indention']}ui_print(\" \");\n") .
+			($options['silence'] ? "" : "{$options['log_indention']}ui_print(\"Selecting kernel for target: {$target_device}\");\n") .
+			($options['silence'] ? "" : "{$options['log_indention']}ui_print(\"\");\n") .
 			"    package_extract_file(\"{$target_ota_file_path}\", \"{$scripting_kernel_target}\");\n" .
 			"endif;\n";
 		;
@@ -134,9 +138,13 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 		$updater_script = str_replace("\0/AABS_KERNEL_COMMAND_PLACEHOLDER\0/", $target_kernel_flash_commands, $updater_script);
 	}
 
-	if ($target_assert_command != "") {
+	if ($target_assert_command != "" && $target_assert_devices != "") {
+		$target_assert_devices = substr($target_assert_devices, 0, strlen($target_assert_devices) - 1);
 		$updater_script = str_replace($scripting_assert_command, "\0/AABS_ASSERT_COMMAND_PLACEHOLDER\0/", $updater_script);
-		$updater_script = str_replace("\0/AABS_ASSERT_COMMAND_PLACEHOLDER\0/", '!(' . $target_assert_command . ')', $updater_script);
+		$updater_script = str_replace(
+			"\0/AABS_ASSERT_COMMAND_PLACEHOLDER\0/",
+			'assert(' . $target_assert_command . ' || abort("E3004: This package is for ' . $target_assert_devices . '; this device is " + getprop("ro.product.name") + "."););' . "\n",
+			$updater_script);
 	}
 
 	// save updater-script
@@ -163,7 +171,7 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 	}
 
 	// clean up
-	xexec("rm -rfv {$extracted_dir}");
-	xexec("mv -fv {$output_path} {$output_path}.old");
-	xexec("mv -fv {$output_path}.aabs.zip {$output_path}");
+	// xexec("rm -rfv {$extracted_dir}");
+	// xexec("mv -fv {$output_path} {$output_path}.old");
+	// xexec("mv -fv {$output_path}.aabs.zip {$output_path}");
 }
