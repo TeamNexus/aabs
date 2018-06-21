@@ -76,8 +76,8 @@ function build_rom($rom, $lunch_rom) {
 	));
 
 	aabs_patch($rom, array(
-		'silence' => true,
-		'log_indention' => ($rom == "NexusOS" ? "    " : "")
+		'silence' => false,
+		'log_indention' => ($rom == "NexusOS" ? "     " : "")
 	), "zerofltexx", "{$lunch_rom}_zerofltexx-ota-*.zip", array(
 		'zerofltexx' => array(
 			'types' => array( "BOOT" ),
