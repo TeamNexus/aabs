@@ -136,7 +136,7 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 
 	if ($target_assert_command != "") {
 		$updater_script = str_replace($scripting_assert_command, "\0/AABS_ASSERT_COMMAND_PLACEHOLDER\0/", $updater_script);
-		$updater_script = str_replace("\0/AABS_ASSERT_COMMAND_PLACEHOLDER\0/", $target_assert_command, $updater_script);
+		$updater_script = str_replace("\0/AABS_ASSERT_COMMAND_PLACEHOLDER\0/", '!(' . $target_assert_command . ')', $updater_script);
 	}
 
 	// save updater-script
