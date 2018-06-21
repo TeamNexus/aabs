@@ -74,12 +74,21 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 		'ui_print(" ");' . "\n" .
 		$updater_script;
 
+	// extract assert command
+	if (!preg_match('/assert\((.+) \|\| abort\("E3004: This package is for device:/s', $updater_script, $scripting_assert_preg)) {
+		die("Cannot continue to patch OTA-package: Failed to find asserting command\n");
+	}
+	$scripting_assert_command = $scripting_assert_preg[1];
+
 	// extract kernel-flash command
 	if (!preg_match('/package_extract_file\("boot\.img", "(.+)"\);/', $updater_script, $scripting_kernel_preg)) {
 		die("Cannot continue to patch OTA-package: Failed to find command for kernel-flashing\n");
 	}
 	$scripting_kernel_command = $scripting_kernel_preg[0];
 	$scripting_kernel_target = $scripting_kernel_preg[1];
+
+	// compose new assert command
+	$target_assert_command = "";
 
 	// compose kernel flash-commands
 	$kernel_targets = 0;
@@ -92,12 +101,16 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 		$target_ota_file_path = "patches/boot-{$target_device}.img";
 
 		// compose scripting-command
-		$target_kernel_flash_command = 'getprop("ro.product.device") == "' . $target_device . '" || ' . 
-				'getprop("ro.build.product") == "' . $target_device . '"';
+		$target_kernel_flash_command = 'getprop("ro.product.device") == "' . $target_device . '"';
 
 		foreach ($target['aliases'] as $target_alias)
-			$target_kernel_flash_command .= ' || getprop("ro.product.device") == "' . $target_alias . '" || ' . 
-				'getprop("ro.build.product") == "' . $target_alias . '"';
+			$target_kernel_flash_command .= ' || getprop("ro.product.name") == "' . $target_alias . '"';
+
+		if ($target_assert_command == "") {
+			$target_assert_command = $target_kernel_flash_command;
+		} else {
+			$target_assert_command .= ' || ' . $target_kernel_flash_command;
+		}
 
 		$target_kernel_flash_command =
 			"if ({$target_kernel_flash_command}) then\n" .
@@ -119,6 +132,11 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 		xexec("rm -vf \"{$extracted_dir}/boot.img\"");
 		$updater_script = str_replace($scripting_kernel_command, "\0/AABS_KERNEL_COMMAND_PLACEHOLDER\0/", $updater_script);
 		$updater_script = str_replace("\0/AABS_KERNEL_COMMAND_PLACEHOLDER\0/", $target_kernel_flash_commands, $updater_script);
+	}
+
+	if ($target_assert_command != "") {
+		$updater_script = str_replace($scripting_assert_command, "\0/AABS_ASSERT_COMMAND_PLACEHOLDER\0/", $updater_script);
+		$updater_script = str_replace("\0/AABS_ASSERT_COMMAND_PLACEHOLDER\0/", $target_assert_command, $updater_script);
 	}
 
 	// save updater-script
