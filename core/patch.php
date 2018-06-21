@@ -101,7 +101,7 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 		$target_ota_file_path = "patches/boot-{$target_device}.img";
 
 		// compose scripting-command
-		$target_kernel_flash_command = 'getprop("ro.product.device") == "' . $target_device . '"';
+		$target_kernel_flash_command = 'getprop("ro.product.name") == "' . $target_device . '"';
 
 		foreach ($target['aliases'] as $target_alias)
 			$target_kernel_flash_command .= ' || getprop("ro.product.name") == "' . $target_alias . '"';
