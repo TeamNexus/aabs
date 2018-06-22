@@ -188,7 +188,7 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 	if (AABS_SIGN) {
 		$base_output_dir = get_base_output_directory($rom, $source_dir);
 
-		xexec("mv -fv {$output_path}.aabs.zip {$output_path}-unsigned.aabs.zip");
+		xexec("mv -fv {$output_path}.aabs.zip {$output_path}.unsigned.aabs.zip");
 
 		// sign OTA
 		xexec("cd {$source_dir}/; java " .
@@ -196,7 +196,7 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 			"-Djava.library.path={$base_output_dir}/host/linux-x86/lib64 " .
 			"-jar {$base_output_dir}/host/linux-x86/framework/signapk.jar " .
 			"-w " . AABS_SIGN_PUBKEY . " " . AABS_SIGN_PRIVKEY . " " .
-			"{$output_path}-unsigned.aabs.zip " .
+			"{$output_path}.unsigned.aabs.zip " .
 			"{$output_path}.aabs.zip");
 	}
 
