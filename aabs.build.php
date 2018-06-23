@@ -41,37 +41,37 @@ function build_rom($rom, $lunch_rom) {
 			'clean'   => array( "{$lunch_rom}_zerofltexx-ota-*.zip" ),
 			'clobber' => AABS_SOURCE_CLOBBER,
 			'match'   => "{$lunch_rom}_zerofltexx-ota-*.zip",
-			'targets' => "otapackage",
+			'targets' => "otapackage recoveryimage",
 		),
 		'zeroltexx' => array(
 			'clean'   => array( "boot.img" ),
 			'clobber' => false,
 			'match'   => "boot.img",
-			'targets' => "bootimage",
+			'targets' => "bootimage recoveryimage",
 		),
 		'zerofltecan' => array(
 			'clean'   => array( "boot.img" ),
 			'clobber' => false,
 			'match'   => "boot.img",
-			'targets' => "bootimage",
+			'targets' => "bootimage recoveryimage",
 		),
 		'zeroltecan' => array(
 			'clean'   => array( "boot.img" ),
 			'clobber' => false,
 			'match'   => "boot.img",
-			'targets' => "bootimage",
+			'targets' => "bootimage recoveryimage",
 		),
 		'zerofltespr' => array(
 			'clean'   => array( "boot.img" ),
 			'clobber' => false,
 			'match'   => "boot.img",
-			'targets' => "bootimage",
+			'targets' => "bootimage recoveryimage",
 		),
 		'zeroltespr' => array(
 			'clean'   => array( "boot.img" ),
 			'clobber' => false,
 			'match'   => "boot.img",
-			'targets' => "bootimage",
+			'targets' => "bootimage recoveryimage",
 		),
 	));
 
@@ -144,33 +144,6 @@ function build_rom($rom, $lunch_rom) {
 	 * Recoveries for G92[0/5]F/I/S/K/L/P
 	 */
 	if ($rom == "NexusOS") {
-		aabs_build($rom, $lunch_rom, 'userdebug', array(
-			'zerofltexx' => array(
-				'clean'   => array( "recovery", "root", "recovery.img" ),
-				'clobber' => false,
-				'match'   => "recovery.img",
-				'targets' => "recoveryimage",
-			),
-			'zeroltexx' => array(
-				'clean'   => array( "recovery", "root", "recovery.img" ),
-				'clobber' => false,
-				'match'   => "recovery.img",
-				'targets' => "recoveryimage",
-			),
-			'zerofltespr' => array(
-				'clean'   => array( "recovery", "root", "recovery.img" ),
-				'clobber' => false,
-				'match'   => "recovery.img",
-				'targets' => "recoveryimage",
-			),
-			'zeroltespr' => array(
-				'clean'   => array( "recovery", "root", "recovery.img" ),
-				'clobber' => false,
-				'match'   => "recovery.img",
-				'targets' => "recoveryimage",
-			),
-		));
-
 		aabs_upload_multi($rom, "zero", array( 'jobs' => 4 ), array(
 			// G920F/I/S/K/L/T/W8
 			'zerofltexx' => array(
@@ -179,6 +152,16 @@ function build_rom($rom, $lunch_rom) {
 			),
 			// G925F/I/S/K/L/T/W8
 			'zeroltexx' => array(
+				'match' => "recovery.img",
+				'type'  => BUILD_TYPE_RECOVERY,
+			),
+			// G920F/I/S/K/L
+			'zerofltecan' => array(
+				'match' => "recovery.img",
+				'type'  => BUILD_TYPE_RECOVERY,
+			),
+			// G925F/I/S/K/L
+			'zeroltecan' => array(
 				'match' => "recovery.img",
 				'type'  => BUILD_TYPE_RECOVERY,
 			),
