@@ -79,6 +79,9 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 		'ui_print(" ");' . "\n" .
 		'ui_print("    ' . $target_device_list . '");' . "\n" .
 		'ui_print(" ");' . "\n" .
+		'assert(' .
+			'(!less_than_int(getprop("ro.bootimage.build.date.utc"), ' . PATCH_MIN_RECOVERY_VERSION . ')) || ' .
+			'abort("E3003: Current recovery is not supported by this build. Consider to update your recovery."););' . "\n" .
 		$original_updater_script;
 
 	// extract assert command

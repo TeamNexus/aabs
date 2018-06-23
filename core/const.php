@@ -19,3 +19,6 @@ define('BUILD_TYPE_BUILD', 1);
 define('BUILD_TYPE_PATCH', 2);
 define('BUILD_TYPE_BOOT', 3);
 define('BUILD_TYPE_RECOVERY', 4);
+
+// minimal version of TWRP recovery
+define('PATCH_MIN_RECOVERY_VERSION', 1529565799);
