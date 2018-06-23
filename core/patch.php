@@ -59,9 +59,8 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 	// print debugging/support-infos
 	$target_device_list = "";
 	foreach ($targets as $target_device => $target) {
-		$target_device_list .= "{$target_device},";
-		foreach ($target['aliases'] as $target_alias)
-			$target_device_list .= "{$target_alias},";
+		foreach ($target['models'] as $target_model => $target_name)
+			$target_device_list .= "{$target_name},";
 	}
 	$target_device_list = substr($target_device_list, 0, strlen($target_device_list) - 1);
 
@@ -120,11 +119,11 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 		$target_ota_file_path = "patches/boot-{$target_device}.img";
 
 		// compose scripting-command
-		$target_kernel_flash_command = 'getprop("ro.product.name") == "' . $target_device . '"';
-
-		foreach ($target['aliases'] as $target_alias) {
-			$target_kernel_flash_command .= ' || getprop("ro.product.name") == "' . $target_alias . '"';
+		$target_kernel_flash_command = "";
+		foreach ($target['models'] as $target_model => $target_name) {
+			$target_kernel_flash_command .= 'starts_with("' . $target_model . '", getprop("ro.boot.bootloader")) || ';
 		}
+		$target_kernel_flash_command = substr($target_kernel_flash_command, 0, strlen($target_kernel_flash_command) - 4);
 
 		if ($target_assert_command == "") {
 			$target_assert_command = $target_kernel_flash_command;
@@ -156,8 +155,22 @@ function aabs_patch($rom, $options, $device, $file_match, $targets) {
 		'this device is " + getprop("ro.product.name") + "."););' . "\n";
 
 	if (!$options['silence']) {
+		foreach ($targets as $target_device => $target) {
+			foreach ($target['models'] as $target_model => $target_name) {
+				$target_assert_command .=
+					'if (starts_with("' . $target_model . '", getprop("ro.boot.bootloader"))) then' . "\n";
+				if ($target_name == $target_device) {
+					$target_assert_command .= '    ui_print("' . $options['log_indention'] . '- Target: ' . $target_device . ' (' . $target_model . ')");' . "\n";
+				} else {
+					$target_assert_command .= '    ui_print("' . $options['log_indention'] . '- Target: ' . $target_device . ' (' . $target_model . '/' . $target_name . ')");' . "\n";
+				}
+				$target_assert_command .=
+					'    ui_print(" ");' . "\n" .
+					'endif;' . "\n";
+			}
+		}
 		$target_assert_command .=
-			'ui_print("' . $options['log_indention'] . '- Target: " + getprop("ro.product.name"));' . "\n" .
+			'ui_print("' . $options['log_indention'] . '- Bootloader: " + getprop("ro.boot.bootloader"));' . "\n" .
 			'ui_print(" ");' . "\n";
 	}
 
