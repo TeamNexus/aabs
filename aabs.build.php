@@ -110,9 +110,9 @@ function build_rom($rom, $lunch_rom) {
 		'zeroltecan' => array(
 			'types' => array( "BOOT" ),
 			'models' => array(
-				'G920T1' => "zeroltemtr",
-				'G920T' => "zeroltetmo",
-				'G920W8' => "zeroltebmc",
+				'G925T1' => "zeroltemtr",
+				'G925T' => "zeroltetmo",
+				'G925W8' => "zeroltebmc",
 			)
 		),
 		'zerofltespr' => array(
