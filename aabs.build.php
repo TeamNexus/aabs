@@ -41,37 +41,37 @@ function build_rom($rom, $lunch_rom) {
 			'clean'   => array( "{$lunch_rom}_zerofltexx-ota-*.zip" ),
 			'clobber' => AABS_SOURCE_CLOBBER,
 			'match'   => "{$lunch_rom}_zerofltexx-ota-*.zip",
-			'targets' => "otapackage recoveryimage",
+			'targets' => "otapackage",
 		),
 		'zeroltexx' => array(
 			'clean'   => array( "boot.img" ),
 			'clobber' => false,
 			'match'   => "boot.img",
-			'targets' => "bootimage recoveryimage",
+			'targets' => "bootimage",
 		),
 		'zerofltecan' => array(
 			'clean'   => array( "boot.img" ),
 			'clobber' => false,
 			'match'   => "boot.img",
-			'targets' => "bootimage recoveryimage",
+			'targets' => "bootimage",
 		),
 		'zeroltecan' => array(
 			'clean'   => array( "boot.img" ),
 			'clobber' => false,
 			'match'   => "boot.img",
-			'targets' => "bootimage recoveryimage",
+			'targets' => "bootimage",
 		),
 		'zerofltespr' => array(
 			'clean'   => array( "boot.img" ),
 			'clobber' => false,
 			'match'   => "boot.img",
-			'targets' => "bootimage recoveryimage",
+			'targets' => "bootimage",
 		),
 		'zeroltespr' => array(
 			'clean'   => array( "boot.img" ),
 			'clobber' => false,
 			'match'   => "boot.img",
-			'targets' => "bootimage recoveryimage",
+			'targets' => "bootimage",
 		),
 	));
 
@@ -140,44 +140,6 @@ function build_rom($rom, $lunch_rom) {
 			)
 		),
 	));
-
-	/*
-	 * Recoveries for G92[0/5]F/I/S/K/L/P
-	 */
-	if ($rom == "NexusOS") {
-		aabs_upload_multi($rom, "zero", array( 'jobs' => 4 ), array(
-			// G920F/I/S/K/L/T/W8
-			'zerofltexx' => array(
-				'match' => "recovery.img",
-				'type'  => BUILD_TYPE_RECOVERY,
-			),
-			// G925F/I/S/K/L/T/W8
-			'zeroltexx' => array(
-				'match' => "recovery.img",
-				'type'  => BUILD_TYPE_RECOVERY,
-			),
-			// G920F/I/S/K/L
-			'zerofltecan' => array(
-				'match' => "recovery.img",
-				'type'  => BUILD_TYPE_RECOVERY,
-			),
-			// G925F/I/S/K/L
-			'zeroltecan' => array(
-				'match' => "recovery.img",
-				'type'  => BUILD_TYPE_RECOVERY,
-			),
-			// G920P
-			'zerofltespr' => array(
-				'match' => "recovery.img",
-				'type'  => BUILD_TYPE_RECOVERY,
-			),
-			// G925P
-			'zeroltespr' => array(
-				'match' => "recovery.img",
-				'type'  => BUILD_TYPE_RECOVERY,
-			),
-		));
-	}
 
 	aabs_upload_multi($rom, "zero", array( 'jobs' => 4 ), array(
 		// G92[0/5]F/I/S/K/L/P
