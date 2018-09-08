@@ -106,6 +106,8 @@ function aabs_build($rom, $lunch_rom, $lunch_flavor, $targets_combinations) {
 
 		if ($clobber) {
 			$command .= 'make clobber -j' . $jobs . "\n" . $__assert;
+		} else {
+			$command .= 'make installclean -j' . $jobs . "\n" . $__assert;
 		}
 
 		// build.prop
